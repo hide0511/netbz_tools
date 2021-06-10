@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}
+見出し調査
+{% endblock %}
+{% block content %}
+<div class="container">
+
+    <h2 class="mb-3">見出し調査</h2>
+  
+    <label for="keyword">キーワード</label>
+
+    <input id="input_data" class="form-control" type="text" name="input_data">
+
+    <button id="button1" class="m-3 btn btn-primary" type="button">調査する</button>
+    <div id="resultGET"></div>
+
+    <button onclick="history.back()" class="btn btn-primary mt-3">戻る</button>
+    <a href="{% url 'index' %}"   class="btn btn-primary mt-3">トップページ</a>
+
+    <script>
+        $('#button1').on('click', function(){
+            dispLoading("処理中...この処理には数分かかることもあります");
+
+            // Ajax通信を開始
+            $.ajax({
+                url: "{% url 'heading' %}",
+                method: "GET",
+                // プレーンテキストを受信（他にはhtml、xml、script、json、jsonp等）
+                dataType: 'text',
+                // リクエストパラメータ「?param1=いろはに&param2=ほへと&param3=ちりぬるを」
+                data: {
+                    param1: $('#input_data').val()
+                },
+                timeout: 120000,
+            })
+            .done(function(data) {
+                // 通信成功時の処理を記述
+                $('#resultGET').html(data);
+            })
+            .fail(function() {
+                // 通信失敗時の処理を記述
+                $('#resultGET').text('GET処理失敗.');
+            })
+            .always( function(data) {
+                // Loading 画像を消す
+                removeLoading();
+            });
+        });
+        /* ------------------------------
+        表示用の関数
+        ------------------------------ */
+        function dispLoading(msg){
+        // 引数なしの場合、メッセージは非表示。
+        if(msg === undefined ) msg = "";
+        
+        // 画面表示メッセージを埋め込み
+        var innerMsg = "<div id='innerMsg'>" + msg + "</div>";  
+        
+        // ローディング画像が非表示かどうかチェックし、非表示の場合のみ出力。
+        if($("#nowLoading").length == 0){
+            $("body").append("<div id='nowLoading'>" + innerMsg + "</div>");
+        }
+        }
+        
+        /* ------------------------------
+        表示ストップ用の関数
+        ------------------------------ */
+        function removeLoading(){
+        $("#nowLoading").remove();
+        }  
+    </script>
+
+</div>
+{% endblock %}

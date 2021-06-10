@@ -1,0 +1,1 @@
+web: gunicorn netbz_tools.wsgi

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+
+    <form action="{% url 'suggest' %}" method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <div class="row">
+          <div class="col-xs-4">
+            <h2 class="mb-3">サジェストキーワード</h2>
+            <label for="keyword">キーワード</label>
+            <input class="form-control" type="text" id="keyword" name="keyword">
+          </div>
+        </div>       
+      </div>
+      <button type="submit" class="btn btn-primary">検索する</button>
+    </form>
+
+    <ul>
+    {% for kw in keylist %}
+        <h2>{{ kw.0 }}</h2>
+        {% for k in kw.1 %}
+            <li><a href="{% url 'suggest' %}?kw={{ k }}" >{{ k }}</a></li>
+        {% endfor %}
+    {% empty %}
+    <p>【{{ keyword }}】の関連キーワードはありません。</p>
+    {% endfor %}
+    </ul>
+
+
+    <section class="col-lg-8 offset-lg-2">
+        <h1>{{ object.name }}</h1>
+        {{ object.memo|linebreaksbr }}
+        <hr>
+        <!-- GET -->
+        <button id="button1" type="button">GETボタン</button>
+        <div id="resultGET"></div>
+        <hr>
+        <!-- POST -->
+        <form name="name_form1" action="{% url 'suggest' %}" method="POST">
+            {% csrf_token %}
+            <input id="input_data" type="text" name="input_data" value="POSTのデータ">
+            <input class="btn" type="submit" value="POSTボタン">
+        </form>
+        <div id="resultPOST"></div>
+
+        <script>
+            $('#button1').on('click', function(){
+                $('#resultGET').text('通信中...');
+                // Ajax通信を開始
+                $.ajax({
+                    url: "{% url 'suggest' %}",
+                    method: "GET",
+                    // プレーンテキストを受信（他にはhtml、xml、script、json、jsonp等）
+                    dataType: 'text',
+                    // リクエストパラメータ「?param1=いろはに&param2=ほへと&param3=ちりぬるを」
+                    data: {
+                        param1: $('#input_data').val(),
+                        param2: 'ほへと',
+                        param3: 'ちりぬるを '
+                    },
+                    timeout: 5000,
+                })
+                .done(function(data) {
+                    // 通信成功時の処理を記述
+                    $('#resultGET').text('GET処理成功：' + data);
+                })
+                .fail(function() {
+                    // 通信失敗時の処理を記述
+                    $('#resultGET').text('GET処理失敗.');
+                });
+            })
+            $("form").submit( function(event) {
+                event.preventDefault();
+                var form = $(this);
+                $('#resultPOST').text('通信中...');
+                // Ajax通信を開始
+                $.ajax({
+                     url: form.prop("action"),
+                     method: form.prop("method"),
+                     data: form.serialize(),
+                     timeout: 5000,
+                     dataType: "text",
+                })
+                .done( function(data) {
+                    // 通信成功時の処理を記述
+                    $('#resultPOST').text('POST処理成功：' + data);
+                })
+                .fail(function() {
+                    // 通信失敗時の処理を記述
+                    $('#resultPOST').text('POST処理失敗.');
+                });
+            });
+        </script>
+        <p><a href="javascript:history.back()">&lt; Back</a></p>
+    </section>
+
+
+</div>
+{% endblock %}

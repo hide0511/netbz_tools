@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}
+ネットビジネスツールズ
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>文字数</h2>
+    <a href = "{% url 'chrcount' %}" >こちら</a>   
+    <h2>見出し</h2>
+    <a href = "{% url 'heading' %}" >こちら</a>   
+    <h2>サジェストキーワード</h2>
+    <a href = "{% url 'suggest' %}" >こちら</a>    
+    <h2>虫眼鏡キーワード</h2>
+    <h2>広告キーワード</h2>
+    <h2>文字列の書き換え</h2>
+</div>
+{% endblock %}

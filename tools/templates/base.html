@@ -1,0 +1,85 @@
+{% load static %}
+<!doctype html>
+<html lang="ja">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  <body>
+    <div class="jumbotron">
+    <div class="container">
+      <h1 class="display-4">ネットビジネスTOOLS！</h1>
+      <p class="lead">ネットビジネスを効率的に実践するためのツールサイト</p>
+    </div>
+    </div>
+
+    {% block content %}{% endblock %}
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+    <script>
+        $('#button1').on('click', function(){
+            dispLoading("処理中...この処理には数分かかることもあります");
+
+            // Ajax通信を開始
+            $.ajax({
+                {% block url %}{% endblock %}
+                method: "GET",
+                // プレーンテキストを受信（他にはhtml、xml、script、json、jsonp等）
+                dataType: 'text',
+                // リクエストパラメータ「?param1=いろはに&param2=ほへと&param3=ちりぬるを」
+                data: {
+                    param1: $('#input_data').val()
+                },
+                timeout: 120000,
+            })
+            .done(function(data) {
+                // 通信成功時の処理を記述
+                $('#resultGET').html(data);
+            })
+            .fail(function() {
+                // 通信失敗時の処理を記述
+                $('#resultGET').text('GET処理失敗.');
+            })
+            .always( function(data) {
+                // Loading 画像を消す
+                removeLoading();
+            });
+        });
+        /* ------------------------------
+        表示用の関数
+        ------------------------------ */
+        function dispLoading(msg){
+        // 引数なしの場合、メッセージは非表示。
+        if(msg === undefined ) msg = "";
+        
+        // 画面表示メッセージを埋め込み
+        var innerMsg = "<div id='innerMsg'>" + msg + "</div>";  
+        
+        // ローディング画像が非表示かどうかチェックし、非表示の場合のみ出力。
+        if($("#nowLoading").length == 0){
+            $("body").append("<div id='nowLoading'>" + innerMsg + "</div>");
+        }
+        }
+        
+        /* ------------------------------
+        表示ストップ用の関数
+        ------------------------------ */
+        function removeLoading(){
+        $("#nowLoading").remove();
+        }  
+    </script>
+
+
+   </body>
+</html>

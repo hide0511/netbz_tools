@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}
+サジェストキーワード
+{% endblock %}
+{% block content %}
+<div class="container">
+
+    <h2 class="mb-3">サジェストキーワード</h2>
+    <label for="keyword">キーワード</label>
+
+    <input id="input_data" class="form-control" type="text" name="input_data">
+
+    <button id="button1" class="m-3 btn btn-primary" type="button">調査する</button>
+    <div id="resultGET"></div>
+
+    <button onclick="history.back()" class="btn btn-primary mt-3">戻る</button>
+    <a href="{% url 'index' %}"   class="btn btn-primary mt-3">トップページ</a>
+
+</div>
+{% endblock %}
+
+{% block url %}url: "{% url 'suggest' %}",{% endblock %}
+                
