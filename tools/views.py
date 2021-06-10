@@ -15,6 +15,8 @@ import random
 class IndexView(TemplateView):
     template_name = 'index.html'
 
+class RealTimeCnt(TemplateView):
+    template_name = "realtimecnt.html"
 
 class ChrCountView(TemplateView):
     template_name = "chrcount.html"
