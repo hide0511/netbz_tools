@@ -64,7 +64,7 @@ class ChrCountView(TemplateView):
     def getChrCount(self,keyword):
         ret = []
 
-        url = 'https://www.google.com/search?q={}&sourceid=chrome&ie=UTF-8&num=15'
+        url = 'https://www.google.com/search?q={}&hl=ja&sourceid=chrome&ie=UTF-8&num=15'
 
         print(keyword)
 
@@ -167,7 +167,7 @@ class HeadingView(TemplateView):
     def getHeading(self,keyword):
         ret = []
 
-        url = 'https://www.google.com/search?q={}&sourceid=chrome&ie=UTF-8&num=15'
+        url = 'https://www.google.com/search?q={}&hl=ja&sourceid=chrome&ie=UTF-8&num=15'
 
         print(keyword)
 
