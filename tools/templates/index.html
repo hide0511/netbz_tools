@@ -3,16 +3,52 @@
 ネットビジネスツールズ
 {% endblock %}
 {% block content %}
-<div class="container">
-    <h2>リアルタイム文字カウンター</h2>
-    <a href = "{% url 'realtimecnt' %}" >こちら</a>   
-    <h2>推奨文字数</h2>
-    <a href = "{% url 'chrcount' %}" >こちら</a>   
-    <h2>ライバル見出し調査</h2>
-    <a href = "{% url 'heading' %}" >こちら</a>   
-    <h2>関連キーワードチェッカー</h2>
-    <a href = "{% url 'suggest' %}" >こちら</a>    
-    <h2>虫眼鏡キーワード＋広告</h2>
-    <h2>文字列の書き換え</h2>
-</div>
+
+        <div class="col-sm-12 col-lg-4">
+            <div class="DivLink mb-3">
+                <div class="p-2">
+                    <p><span class = "top-title">■リアルタイム文字カウンター</span></p>
+                    <p>文字数をリアルタイムにカウントします。</p>
+                    <a class ="Link" href="{% url 'realtimecnt' %}"></a>
+                </div>
+            </div>
+            <div class="DivLink mb-3">
+                <div class="p-2">
+                    <p><span class = "top-title">■推奨文字数</span></p>
+                    <p>文字数をリアルタイムにカウントします。</p>
+                    <a class ="Link" href="{% url 'chrcount' %}"></a>
+                </div>
+            </div>
+            <div class="DivLink mb-3">
+                <div class="p-2">
+                    <p><span class = "top-title">■ライバル見出し調査</span></p>
+                    <p>文字数をリアルタイムにカウントします。</p>
+                    <a class ="Link" href="{% url 'heading' %}"></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-lg-4">
+            <div class="DivLink mb-3">
+                <div class="p-2">
+                    <p><span class = "top-title">■関連キーワードチェッカー</span></p>
+                    <p>文字数をリアルタイムにカウントします。</p>
+                    <a class ="Link" href="{% url 'suggest' %}"></a>
+                </div>
+            </div>
+            <div class="DivLink mb-3">
+                <div class="p-2">
+                    <p><span class = "top-title">■虫眼鏡キーワード＋広告<</span></p>
+                    <p>文字数をリアルタイムにカウントします。</p>
+                    <a class ="Link" href="{% url 'suggest' %}"></a>
+                </div>
+            </div>
+            <div class="DivLink mb-3">
+                <div class="p-2">
+                    <p><span class = "top-title">■文字列の書き換え</span></p>
+                    <p>文字数をリアルタイムにカウントします。</p>
+                    <a class ="Link" href="{% url 'suggest' %}"></a>
+                </div>
+            </div>
+        </div>
+
 {% endblock %}

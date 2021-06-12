@@ -31,3 +31,7 @@
     z-index:100;
     background: url("../img/loading.gif") center center no-repeat;
   }
+
+  .font-2large {
+    font-size: 2rem;
+  }

@@ -9,6 +9,7 @@ from string import digits
 import requests
 import urllib.parse
 import random
+import whois
 
 # Create your views here.
 
@@ -17,6 +18,9 @@ class IndexView(TemplateView):
 
 class RealTimeCnt(TemplateView):
     template_name = "realtimecnt.html"
+
+class WhoIs(TemplateView):
+    template_name = "whois.html"
 
 class ChrCountView(TemplateView):
     template_name = "chrcount.html"

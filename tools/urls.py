@@ -8,4 +8,5 @@ urlpatterns = [
     path('heading/',views.HeadingView.as_view(),name='heading'),
     path('chrcount/',views.ChrCountView.as_view(),name='chrcount'),
     path('realtimecnt/',views.RealTimeCnt.as_view(),name='realtimecnt'),
+    path('whois/',views.WhoIs.as_view(),name='whois'),
 ]

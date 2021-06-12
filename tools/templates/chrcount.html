@@ -3,7 +3,7 @@
 推奨文字数
 {% endblock %}
 {% block content %}
-<div class="container">
+<div class="col-sm-12 col-lg-9">
 
     <h2 class="mb-3">推奨文字数</h2>
   
@@ -14,8 +14,6 @@
     <button id="button1" class="m-3 btn btn-primary" type="button">調査する</button>
     <div id="resultGET"></div>
 
-    <button onclick="history.back()" class="btn btn-primary mt-3">戻る</button>
-    <a href="{% url 'index' %}"   class="btn btn-primary mt-3">トップページ</a>
 </div>
 {% endblock %}
 

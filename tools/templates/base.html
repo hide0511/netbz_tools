@@ -19,13 +19,32 @@
     </div>
     </div>
 
-    {% block content %}{% endblock %}
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<div class="container">
+    <div class="row">
+
+        {% block content %}{% endblock %}
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+        <div class="col-sm-12 col-lg-3">
+            <h3>リンク</h3>
+            <p><a href="{% url 'index' %}">トップページ</a></p>
+            <p>リアルタイム文字カウンター</p>
+            <p>関連キーワードチェッカー</p>
+            <p>推奨文字数</p>
+            <p>虫眼鏡キーワード＋広告</p>
+            <p>ライバル見出し調査</p>
+            <p>文字列の書き換え</p>
+            <p>Whois調査</p>
+        </div>
+    </div>
+</div>
 
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+    {% block script %}{% endblock %}
 
     <script>
         $('#button1').on('click', function(){

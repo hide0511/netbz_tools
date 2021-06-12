@@ -21,13 +21,46 @@
     left: 0;
     background-color: #fff;
     opacity: 0.8;
-  }
+}
    
-  #innerMsg {
+#innerMsg {
     display: table-cell;
     text-align: center;
     vertical-align: middle;
     padding-top: 140px;
     z-index:100;
     background: url("../img/loading.gif") center center no-repeat;
-  }
+}
+
+
+/* トップページ用  */
+.DivLink{
+    position:relative;
+    background-color:#ffffff; /* 枠の背景色 */
+    border:1px solid #777; /* 枠の線の太さ・種類・色 */
+    border-radius:5px; /* 枠の角を丸くする */
+    box-shadow: 1px 2px 2px #ddd; /*影をいれる*/
+    font-family:inherit; /* フォントの種類を継承する */
+    font-size:0.85em;	/* フォントの大きさ */
+}
+
+.DivLink .Link{
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.DivLink:hover {
+  box-shadow: 0 4px 7px 0 rgba(0, 0, 0, 0.5);
+  transform: translateY(-5px);
+  cursor: pointer;
+}
+
+.top-title {
+    font-size: 1.25rem;
+    background: linear-gradient(transparent 50%, #c1e0ff 70%);
+    font-weight: bold; 
+}

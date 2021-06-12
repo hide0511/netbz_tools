@@ -3,18 +3,281 @@
 リアルタイム文字カウンター
 {% endblock %}
 {% block content %}
-<div class="container">
+<div class="col-sm-12 col-lg-9">
 
     <h2 class="mb-3">リアルタイム文字カウンター</h2>
-    <label for="keyword">キーワード</label>
+    <p><span class="lead">■文字数：</span><span id="cntResultSpace" class="lead">0</span></p>
+    <p><span class="lead">■行数：</span><span id="cntResultLine" class="lead">0</span></p>
+    <p><span class="lead">■段落数：</span><span id="cntResultParagraph" class="lead">0</span></p>
 
-    <input id="input_data" class="form-control" type="text" name="input_data">
+    <div id="cntFormArea">
 
-    <button id="button1" class="m-3 btn btn-primary" type="button">調査する</button>
-    <div id="resultGET"></div>
+        <textarea id="txtCounter" cols="80" rows="5" placeholder="カウントする文字を入力してください" class="mb-2"></textarea>
+        <div class="reset_btn"><button class="white_btn" id="btnReset">リセット</button></div>
+        <div class="mt-3">
+            <p class="mb-2">
+                <label>
+                    <input type="checkbox" id="checkRemoveSpace" checked="checked"><span for="checkHtmlEntity">空白、空行を含めない</span>
+                </label>
+            </p>
+            <p class="mb-2">
+                <label>
+                    <input type="checkbox" id="checkRemoveHtml"><span for="checkRemoveHtml">htmlコードを含めない</span>
+                </label>
+            </p>
+            <p class="mb-2">
+                <label>
+                    <input type="checkbox" id="checkRemoveComma"><span for="checkRemoveComma">句読点を含めない</span>
+                </label>
+            </p>
+        </div>
+    </div>
+    <div id="cntResultArea">
+        <!-- 文字数（文前後の空白なし）
+        <div class="result_label_important">■文字数（文前後の空白なし）</div>
+        <p <span class="result_label_important">■文字数（空白込み）：</span><span id="cntResult" class="important">0</span></p>
+        <p><span class="result_label">■文字数（空白なし）：</span><span id="cntResultRemoveAllSpace" class="result_cnt">0</span></p>
+        <p><span class="result_label">■行数（空白行込み）：</span><span id="cntResultLineSpace" class="result_cnt">0</span></p>
+        その他 -->
+        
 
-    <button onclick="history.back()" class="btn btn-primary mt-3">戻る</button>
-    <a href="{% url 'index' %}"   class="btn btn-primary mt-3">トップページ</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+$(function() {
+    // テキストエリアキー入力
+    $('#txtCounter').keyup(function() {
+        countText();
+    });
+    // テキストエリア変更
+    $('#txtCounter').change(function() {
+        countText();
+    });
+    // 右クリック貼り付け
+    $('#txtCounter').on("paste",function(event){
+        setTimeout(function() {
+	        countText();
+        }, 10) ;
+    });
+    // スマホ候補テキスト選択対策
+    $('#txtCounter').on("focus", function(){
+        $(window).on("click blur keydown keyup keypress change touchstart", function(){
+            countText();
+        });
+    });
+    // 空白、空行、html、句読点除去チェック
+    $('#cntFormArea input[type="checkbox"]').change(function() {
+        countText();
+    });
+
+    /**
+     * 入力文字リセット
+     */
+    $('#btnReset').click(function() {
+        $('#txtCounter').val("");
+        countText();
+    });
+    
+    /**
+     * 文字数をカウントする
+     */
+    function countText() {
+        var txtCounter = $('#txtCounter').val();
+        if(txtCounter != ""){
+            // html除去チェックが入っていればhtml除去
+            if($("#checkRemoveHtml").is(':checked')){
+                txtCounter = txtCounter.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'');
+            }
+            // 句読点除去チェックが入っていれば句読点除去
+            if($("#checkRemoveComma").is(':checked')){
+                txtCounter = txtCounter.replace(/[、。.,]/g,'');
+            }
+            // 空白除去チェックが入っていれば空白除去
+            if($("#checkRemoveSpace").is(':checked')){
+                txtCounter = txtCounter.replace(/ +/g,'');
+                txtCounter = txtCounter.replace(/t+/g,'');
+                txtCounter = txtCounter.replace(/ +/g,'');
+            }
+            // HTMLエンティティを1文字としてカウントするチェックが入っていれば
+            /*
+            if($("#checkHtmlEntity").is(':checked')){
+                var div = $(document.createElement("div"));
+                div.html(txtCounter);
+                txtCounter = div.html();
+                txtCounter = txtCounter.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&')
+                    .replace(/&#13;/g, "\r").replace(/&#10;/g, "\n");
+            }
+            */
+            // 改行で分割し配列に入れる
+            txtCounter=txtCounter.replace(/\r\n/ig,"\n");
+            var arrtxtCounter = txtCounter.split(/\n/);
+            var txtCounterRemoveSpace = "";
+            var cntLine = 0;
+            var cntLineSpace = countLine(txtCounter);
+            var cntResultPaperLine = cntLineSpace;
+            var cntParagraph = 0;
+            // 先頭に字下げがなければ1段落目とする
+            if(arrtxtCounter[0].match(/^\s/g) == null){
+                cntParagraph++;
+            }
+            $.each(arrtxtCounter,function(i,lineText){
+            // arrtxtCounter.forEach(lineText => {
+                if(lineText !== ""){
+                    // 空行なしの行数
+                    cntLine++;
+
+                    // 段落数
+                    if(lineText.match(/^\s/g) != null){
+                        cntParagraph++;
+                    }
+                    if(lineText.length > 20){
+                        cntResultPaperLine += Math.ceil(lineText.length/20)-1;
+                    }
+                }
+                // 前後の空白除去
+                txtCounterRemoveSpace += lineText.replace(/^\s+|\s+$/g,'');
+            });
+            // 先頭に字下げがなく、段落数が1の場合は字下げパターン以外でカウント
+            if(arrtxtCounter[0].match(/^\s/g) == null && cntParagraph === 1){
+                // 改行2つで段落パターン
+                cntParagraph = txtCounter.split(/\n\n.+/).length;
+                if(cntParagraph === 1){
+                    // 改行1つで段落パターン
+                    cntParagraph = txtCounter.split(/\n.+/).length;
+                }
+            }
+            if($("#checkRemoveSpace").is(':checked') == false){
+                cntLine = cntLineSpace;
+            }
+
+            // 文字数
+            $('#cntResultSpace').text(stringToArray(txtCounter.replace(/\n/g,'')).length);
+            // 行数（空白行抜き）
+            $('#cntResultLine').text(cntLine);
+            // 段落数
+            $('#cntResultParagraph').text(cntParagraph);
+
+            /*
+            // 文字数（文前後の空白なし）
+            $('#cntResult').text(stringToArray(txtCounterRemoveSpace.replace(/\n/g,'')).length);
+            // 文字数（全ての空白なし）
+            $('#cntResultRemoveAllSpace').text(stringToArray(txtCounter.replace(/\s+/g,'').replace(/\n/g,'')).length);
+            // 単語数
+            $('#cntResultEnWord').text(countWords(txtCounter));
+            // 行数
+            $('#cntResultLineSpace').text(cntLineSpace);
+
+            // 原稿用紙枚数（1行=20文字、20行=1枚）
+            $('#cntResultPaper').text(Math.ceil(cntResultPaperLine/20));
+            $('#cntResultUtf8Byte').text(encodeURIComponent(txtCounter.replace(/\s+/g,'')).replace(/%../g,"x").length);
+            $('#cntResultSjisByte').text(countByte(txtCounter.replace(/\s+/g,'').replace(/\n/g,''), "sjis"));
+            $('#cntResultJisByte').text(countByte(txtCounter.replace(/\s+/g,'').replace(/\n/g,''), "jis"));
+            $('#cntResultEucjpByte').text(countByte(txtCounter.replace(/\s+/g,'').replace(/\n/g,''), "euc"));
+            */
+        }else{
+            //requestGtag();
+
+            $('#cntResult').text(0);
+            $('#cntResultSpace').text(0);
+            $('#cntResultLine').text(0);
+            $('#cntResultLineSpace').text(0);
+            $('#cntResultParagraph').text(0);
+            $('#cntResultRemoveAllSpace').text(0);
+            /*
+            $('#cntResultPaper').text(0);
+            $('#cntResultUtf8Byte').text(0);
+            $('#cntResultSjisByte').text(0);
+            $('#cntResultJisByte').text(0);
+            $('#cntResultEucjpByte').text(0);
+            */
+        }
+    }
+
+    /**
+     * 英単語数をカウントする
+     */
+    function countWords(txtCounter) {
+        return (txtCounter+=".").replace(/(\,|\.|:|;|\!|\?|\s)+/g, " ").split(" ").length - 1;
+    }
+
+    /**
+     * サロゲートペアに対応した配列化をする
+     * 絵文字、CJK統合漢字拡張文字
+     */
+    function stringToArray(str) {
+        return str.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[^\uD800-\uDFFF]/g) || [];
+    }
+
+    /**
+     * 行数をカウントする
+     */
+    function countLine(txtCounter) {
+        var num = txtCounter.match(/\r\n|\n/g);
+        if(num != null){
+            return num.length +1;
+        }else{
+            if(txtCounter !== ""){
+                return 1;
+            }else{
+                return 0;
+            }
+        }
+    }
+
+    function countByte(txtCounter, type) {
+        var CODE_TYPE_ASCII = 0;
+        var CODE_TYPE_KANJI = 1;
+        var cnt = 0;
+        var codeType = CODE_TYPE_ASCII;
+        for (var i = 0; i < txtCounter.length; i++) {
+            var code = txtCounter.charCodeAt(i);
+            if(type === "sjis"){
+                // Shift_JIS: 0x0 ～ 0x80, 0xa0  , 0xa1   ～ 0xdf  , 0xfd   ～ 0xff
+                // Unicode  : 0x0 ～ 0x80, 0xf8f0, 0xff61 ～ 0xff9f, 0xf8f1 ～ 0xf8f3
+                if ( (code >= 0x0 && code < 0x81) || (code == 0xf8f0) || (code >= 0xff61 && code < 0xffa0) || (code >= 0xf8f1 && code < 0xf8f4)) {
+                    cnt += 1;
+                } else {
+                    cnt += 2;
+                }
+            }else{
+                if(type === "jis"){
+                    if (codeType != CODE_TYPE_KANJI) {
+                        cnt += 3;
+                        codeType = CODE_TYPE_ASCII;
+                    }
+                }
+                // 半角英数
+                if (code <= 0x007e) {
+                    cnt++;
+                } else if (code >= 0xFF61 && code <= 0xFF9F) {
+                    // 半角カタカナ
+                    if(type === "euc"){
+                        cnt += 2;
+                    }else{
+                        cnt++;
+                    }
+                } else if (code >= 0x10000) {
+                    // 全角（UCS-4マルチバイト文字）
+                    cnt += 2;
+                } else {
+                    // 全角
+                    cnt += 2;
+                }
+            }
+        }
+        if (codeType != CODE_TYPE_ASCII) {
+            if(type === "jis"){
+                // 最後の文字がASCII文字でない場合、エスケープシーケンスを増やす
+                cnt += 3;
+            }
+        }
+        return cnt;
+    }   
+});
+</script>
 
 </div>
 {% endblock %}
