@@ -21,6 +21,8 @@ import matplotlib
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
+import japanize_matplotlib 
+
 import io
 import base64
 
@@ -54,7 +56,7 @@ class FrequentWordView(TemplateView):
                 c = collections.Counter(words)    
 
                 sns.set(context="talk")
-                sns.set(font='Yu Gothic')
+                sns.set(font='IPAexGothic')
                 fig = plt.subplots(figsize=(8, 20))
                 #fig = plt.figure(facecolor="skyblue", linewidth=300, edgecolor="green")
                 plt.title(f'「{keyword}」の頻出キーワード')
