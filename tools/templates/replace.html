@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}
+複数文字の置き換え
+{% endblock %}
+{% block content %}
+<div class="col-sm-12 col-lg-9">
+    <h2 class="mb-3">複数文字の置き換え</h2>
+</div>
+<div class="col-sm-12 col-lg-4">
+
+
+    <textarea id="txtCounter" style="width:100%" rows="5" placeholder="カウントする文字を入力してください" class="mb-2"></textarea>
+
+</div>
+
+<div class="col-sm-12 col-lg-1">
+
+    <button id="button1" class="m-3 btn btn-primary" type="button">置換</button>
+
+</div>
+
+
+<div class="col-sm-12 col-lg-4">
+
+    <textarea id="txtCounter" style="width:100%" rows="5" placeholder="カウントする文字を入力してください" class="mb-2"></textarea>
+
+</div>
+
+
+{% endblock %}
+
+{% block url %}url: "{% url 'whois' %}",{% endblock %}

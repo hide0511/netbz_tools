@@ -7,6 +7,8 @@ urlpatterns = [
     path('suggest/',views.SuggestView.as_view(),name='suggest'),
     path('heading/',views.HeadingView.as_view(),name='heading'),
     path('chrcount/',views.ChrCountView.as_view(),name='chrcount'),
-    path('realtimecnt/',views.RealTimeCnt.as_view(),name='realtimecnt'),
-    path('whois/',views.WhoIs.as_view(),name='whois'),
+    path('realtimecnt/',views.RealTimeCntView.as_view(),name='realtimecnt'),
+    path('whois/',views.WhoIsView.as_view(),name='whois'),
+    path('replace/',views.ReplaceView.as_view(),name='replace'),
+    path('frequent/',views.FrequentWordView.as_view(),name='frequent'),
 ]

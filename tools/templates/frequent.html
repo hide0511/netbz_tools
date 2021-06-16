@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block title %}
-Whois調査
+頻出キーワード調査
 {% endblock %}
 {% block content %}
 <div class="col-sm-12 col-lg-9">
 
-    <h2 class="mb-3">Whois調査</h2>
-    <label for="keyword">ドメイン or URL</label>
+    <h2 class="mb-3">頻出キーワード調査</h2>
+    <label for="keyword">キーワード</label>
 
     <input id="input_data" class="form-control" type="text" name="input_data">
 
@@ -17,4 +17,4 @@ Whois調査
 </div>
 {% endblock %}
 
-{% block url %}url: "{% url 'whois' %}",{% endblock %}
+{% block url %}url: "{% url 'frequent' %}",{% endblock %}

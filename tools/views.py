@@ -10,17 +10,176 @@ import requests
 import urllib.parse
 import random
 import whois
+import re
+import MeCab
+import collections
+import seaborn as sns
+
+import matplotlib
+
+#バックエンドを指定
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
+import io
+import base64
 
 # Create your views here.
 
 class IndexView(TemplateView):
     template_name = 'index.html'
 
-class RealTimeCnt(TemplateView):
+class ReplaceView(TemplateView):
+    template_name = "replace.html"
+
+class RealTimeCntView(TemplateView):
     template_name = "realtimecnt.html"
 
-class WhoIs(TemplateView):
+class FrequentWordView(TemplateView):
+    template_name = "frequent.html"
+
+    def get(self, rq):
+
+        if rq.is_ajax():        
+            if rq.method == 'GET':  # GETの処理
+                LIST_CNT = 100
+
+                param1 = rq.GET.get("param1")  # GETパラメータ1
+                keyword = param1
+
+                words = FrequentWordView.getFrequentWord(self,keyword)
+
+                data = ''
+
+                c = collections.Counter(words)    
+
+                sns.set(context="talk")
+                sns.set(font='Yu Gothic')
+                fig = plt.subplots(figsize=(8, 20))
+                #fig = plt.figure(facecolor="skyblue", linewidth=300, edgecolor="green")
+                plt.title(f'「{keyword}」の頻出キーワード')
+                plt.subplots_adjust(top=0.98,bottom = 0.03,left = 0.2,right = 0.9,hspace = 0.1)
+                
+                sns.countplot(y=words,order=[i[0] for i in c.most_common(LIST_CNT)])
+
+                buffer = io.BytesIO()
+                plt.savefig(buffer, format='png')
+                image_png = buffer.getvalue()
+                graph = base64.b64encode(image_png)
+                graph = graph.decode('utf-8')
+                buffer.close()
+                data = '<h2>グラフ</h2>'
+                data = data + f'<img src="data:image/png;base64, {graph} " alt="">'
+
+                data =  data + '<h2>テーブル</h2>'                
+                data = data + '<div id="resultText"><table class="table table-striped">'
+                for letter, count in c.most_common(LIST_CNT):
+                    data = data + f'<tr><td>{letter}</td><td>{count}</tr>'
+
+                data = data + '</table></div>'
+
+                #data = data.replace('h1','<span class="kakomu">h1</span>')
+                #data = data.replace('h2','<span class="kakomu">h2</span>')
+                #data = data.replace('h3','<span class="kakomu">h3</span>')
+
+                return HttpResponse(data)
+
+        return render(rq, 'frequent.html')
+
+    def getFrequentWord(self,keyword):
+        ret = []
+
+        url = 'https://www.google.com/search?q={}&hl=ja&sourceid=chrome&ie=UTF-8&num=15'
+
+        print(keyword)
+
+        kw = keyword
+        kw = urllib.parse.quote(kw)
+
+        url = url.format(kw)
+
+        data = None
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36"}
+        request = urllib.request.Request(url, data, headers)
+        response = urllib.request.urlopen(request)
+        html = response.read()
+        sleep(0.3)
+
+        soup1 = BeautifulSoup(html,'html.parser')
+
+        _links = soup1.select('.yuRUbf > a')
+
+        links = [link.get('href') for link in _links]
+
+        cnt = 0
+
+        words=[]
+        delete_list = ['し','こと','する','いる','ある','もの','なり','ため','さ','い','あり','よっ','よう']
+
+        for link in links:
+            if cnt >= 10 :
+                break
+
+            try:
+                res = requests.get(link)
+                sleep(0.01)
+
+                if res.status_code == 200:
+
+                    soup2 = BeautifulSoup(res.content,'html.parser')                   
+                   
+                    for script in soup2(["script", "style"]):
+                        script.decompose()
+                    
+                    text=soup2.get_text()
+                    
+
+                    m = MeCab.Tagger ()
+                    
+                    node = m.parseToNode(text)
+                
+                    
+                    while node:
+                        try:
+                            hinshi = node.feature.split(",")[0]
+                            if hinshi in ["名詞","動詞","形容詞","形状詞","副詞"]:
+                                if node.surface not in delete_list:
+                                    if str(node.surface).isdigit() == False:
+                                        words.append(node.surface)
+                        except:
+                            continue
+                        finally:
+                            node = node.next
+
+                    cnt += 1
+            except:
+                continue
+
+
+        return words
+
+class WhoIsView(TemplateView):
     template_name = "whois.html"
+
+    def get(self, rq):
+        if rq.is_ajax():        
+            if rq.method == 'GET':  # GETの処理
+                param1 = rq.GET.get("param1")  # GETパラメータ1
+                url = param1
+
+                result = re.search('(?:https?://)?(?P<host>.*?)(?:[:#?/@]|$)', url)
+
+                #辞書型で取得
+                dc = whois.whois(result.group('host'))
+
+                data = '<div><ul>'
+
+                for key, value in dc.items():
+                    data = data + f'<li>{key}:{value}</li>'
+                data =  data + '</ul></div>'
+
+                return HttpResponse(data)
+        return render(rq, 'whois.html')
 
 class ChrCountView(TemplateView):
     template_name = "chrcount.html"
@@ -53,7 +212,7 @@ class ChrCountView(TemplateView):
                     
                     cnt_num += 1
 
-                data = f'<p class="display-4">このキーワードで記事を書いた場合の推奨文字数は<span class="bg-info">{str(cnt_sum//cnt_num+300)}</span>です。</p>'
+                data = f'<p class="display-4">このキーワードで記事を書いた場合の推奨文字数は<span class="bg-info">{str(cnt_sum//cnt_num+300)}</span>文字です。</p>'
 
                 for dc in result:
                     data = data + '<div class="bg-warning p-1 my-2"><a href="' + dc['link']+ '" target=”_blank”>' + dc['title'] + '</a></div>'               
@@ -106,7 +265,7 @@ class ChrCountView(TemplateView):
 
                 if res.status_code == 200:
 
-                    soup2 = BeautifulSoup(res.content,'html.parser')
+                    soup2 = BeautifulSoup(res.text,'html.parser')
                     
                     dc['title'] = soup2.title.string
                     dc['link'] = link
