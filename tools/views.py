@@ -91,32 +91,12 @@ class FrequentWordView(TemplateView):
     def getFrequentWord(self,keyword):
         ret = []
 
-        url = 'https://www.google.com/search?q={}&hl=ja&sourceid=chrome&ie=UTF-8&num=15'
-
-        print(keyword)
-
-        kw = keyword
-        kw = urllib.parse.quote(kw)
-
-        url = url.format(kw)
-
-        data = None
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36"}
-        request = urllib.request.Request(url, data, headers)
-        response = urllib.request.urlopen(request)
-        html = response.read()
-        sleep(0.3)
-
-        soup1 = BeautifulSoup(html,'html.parser')
-
-        _links = soup1.select('.yuRUbf > a')
-
-        links = [link.get('href') for link in _links]
+        links = getGooleList(self,keyword)
 
         cnt = 0
 
         words=[]
-        delete_list = ['し','こと','する','いる','ある','もの','なり','ため','さ','い','あり','よっ','よう']
+        delete_list = ['し','こと','する','いる','ある','もの','なり','ため','さ','い','あり','よっ','よう','つい','いう','でき','なる']
 
         for link in links:
             if cnt >= 10 :
@@ -231,27 +211,7 @@ class ChrCountView(TemplateView):
     def getChrCount(self,keyword):
         ret = []
 
-        url = 'https://www.google.com/search?q={}&hl=ja&sourceid=chrome&ie=UTF-8&num=15'
-
-        print(keyword)
-
-        kw = keyword
-        kw = urllib.parse.quote(kw)
-
-        url = url.format(kw)
-
-        data = None
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36"}
-        request = urllib.request.Request(url, data, headers)
-        response = urllib.request.urlopen(request)
-        html = response.read()
-        sleep(0.3)
-
-        soup1 = BeautifulSoup(html,'html.parser')
-
-        _links = soup1.select('.yuRUbf > a')
-
-        links = [link.get('href') for link in _links]
+        links = getGooleList(self,keyword)
 
         cnt = 0
         for link in links:
@@ -309,20 +269,21 @@ class HeadingView(TemplateView):
                 data = ''
 
                 for dc in result:
-                    data = data + '<div class="bg-warning p-1 my-2"><a href="' + dc['link']+ '" target=”_blank”>' + dc['title'] + '</a></div>' 
+                    data = data + '<div class="resultSite">'
+                    data = data + '<div class="bg-warning p-1 my-2"><a class="resultAtag" href="{}" target=”_blank”>{}</a></div>'.format(dc['link'],dc['title']) 
                     
                     for d in dc['heading']:
                         if d.find('h1') == 0:
                             d = d.lstrip('h1:')
-                            d = '<span class="kakomu">h1</span>' + d
+                            d = '<span class="kakomu">h1</span>' + f'<span class="midashi">{d}</span>'
                         elif d.find('h2') == 0:
                             d = d.lstrip('h2:')
-                            d = '+ <span class="kakomu">h2</span>' + d
+                            d = '+ <span class="kakomu">h2</span>' + f'<span class="midashi">{d}</span>'
                         elif d.find('h3') == 0:
                             d = d.lstrip('h3:')
-                            d = '+ + <span class="kakomu">h3</span>' + d
-                        data = data + '<p>' + d + '</p>'
-
+                            d = '+ + <span class="kakomu">h3</span>' + f'<span class="midashi">{d}</span>'
+                        data = data + '<p class="resultHeading">' + d + '</p>'
+                    data = data + '</div>'
                 #data = data.replace('h1','<span class="kakomu">h1</span>')
                 #data = data.replace('h2','<span class="kakomu">h2</span>')
                 #data = data.replace('h3','<span class="kakomu">h3</span>')
@@ -334,27 +295,7 @@ class HeadingView(TemplateView):
     def getHeading(self,keyword):
         ret = []
 
-        url = 'https://www.google.com/search?q={}&hl=ja&sourceid=chrome&ie=UTF-8&num=15'
-
-        print(keyword)
-
-        kw = keyword
-        kw = urllib.parse.quote(kw)
-
-        url = url.format(kw)
-
-        data = None
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36"}
-        request = urllib.request.Request(url, data, headers)
-        response = urllib.request.urlopen(request)
-        html = response.read()
-        sleep(0.3)
-
-        soup1 = BeautifulSoup(html,'html.parser')
-
-        _links = soup1.select('.yuRUbf > a')
-
-        links = [link.get('href') for link in _links]
+        links = getGooleList(self,keyword)
 
         cnt = 0
         for link in links:
@@ -429,8 +370,8 @@ class SuggestView(TemplateView):
         url = 'https://www.google.co.jp/complete/search?hl=ja&output=toolbar&ie=utf-8&oe=utf-8&client=Chrome&q='
 
         chrs = []
-        chrs = ["あ","い","う","え","お","か","き","く","け","こ","さ","し","す","せ","そ","た","ち","つ","て","と","な","に","ぬ","ね","の","は","ひ","ふ","へ","ほ","ま","み","む","め","も","や","ゆ","よ","ら","り","る","れ","ろ","わ","を","ん"]
-        #chrs = ["あ","い","う"]
+        #chrs = ["あ","い","う","え","お","か","き","く","け","こ","さ","し","す","せ","そ","た","ち","つ","て","と","な","に","ぬ","ね","の","は","ひ","ふ","へ","ほ","ま","み","む","め","も","や","ゆ","よ","ら","り","る","れ","ろ","わ","を","ん"]
+        chrs = ["あ","い","う"]
         #chrs.extend(ascii_lowercase)
         #chrs.extend(digits)
 
@@ -445,9 +386,35 @@ class SuggestView(TemplateView):
                 buf = r.json()
                 suggests = [keyword + ' ' + ch,[ph for ph in buf[1]]]
                 ret.extend([suggests])
-            sleep(random.uniform(0.05,0.5))
+            sleep(random.uniform(0.01,0.2))
 
         return ret
+
+def getGooleList(self,keyword):
+
+    url = 'https://www.google.com/search?q={}&hl=ja&sourceid=chrome&ie=UTF-8&num=5'
+
+    print(keyword)
+
+    kw = keyword
+    kw = urllib.parse.quote(kw)
+
+    url = url.format(kw)
+
+    data = None
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36"}
+    request = urllib.request.Request(url, data, headers)
+    response = urllib.request.urlopen(request)
+    html = response.read()
+    sleep(0.3)
+
+    soup1 = BeautifulSoup(html,'html.parser')
+
+    _links = soup1.select('.yuRUbf > a')
+
+    links = [link.get('href') for link in _links]
+
+    return links
 
 class SuggestView_old(TemplateView):
     template_name = "suggest.html"

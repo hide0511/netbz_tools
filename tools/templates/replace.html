@@ -1,32 +1,234 @@
 {% extends "base.html" %}
 {% block title %}
-複数文字の置き換え
+文字列の置き換え
 {% endblock %}
 {% block content %}
 <div class="col-sm-12 col-lg-9">
-    <h2 class="mb-3">複数文字の置き換え</h2>
+    <h2 class="mb-3">文字列の置き換え</h2>
 </div>
-<div class="col-sm-12 col-lg-4">
+<div class="col-sm-12 col-lg-6">
 
+    <textarea id="baseText" style="width:100%" rows="15" placeholder="対象のテキストを入力してください" class="mb-2"></textarea>
 
-    <textarea id="txtCounter" style="width:100%" rows="5" placeholder="カウントする文字を入力してください" class="mb-2"></textarea>
-
-</div>
-
-<div class="col-sm-12 col-lg-1">
-
-    <button id="button1" class="m-3 btn btn-primary" type="button">置換</button>
+    <p>検索する文字列</p>
+    <input type="text" id="inputBefore" style="width:100%" class="mb-2"></textarea>
+    <p>置換後の文字列</p>
+    <input type="text" id="inputAfter"  style="width:100%" class="mb-2"></textarea>
 
 </div>
 
+<div class="col-sm-12 col-lg-3">
+    <p>１つずつ検索して置き換える</p>
+    <div class="m-1 border rounded"> 
+        <button id="btnReplaceOne" class="m-2 btn w-75 btn-primary" type="button">次を検索</button>
+        <button id="btnReplaceDo" class="m-2 btn w-75 btn-primary" type="button">検索を置換</button>
+    </div>
+    <p>一括で置き換える</p>
+    <div class="m-1 border rounded">
+        <button id="btnReplaceAll" class="m-2 btn w-75 btn-primary" type="button">一括置換</button>
+    </div>
+    <p>操作</p>
+    <div class="m-1 border rounded">
+        <button id="btnResetData" class="m-2 btn w-75 btn-primary" type="button">初期化</button>
+        <button id="btnPreData" class="m-2 btn w-75 btn-primary" type="button">元に戻す</button>
+        <button id="btnNextData" class="m-2 btn w-75 btn-primary" type="button">やり直す</button>
+    </div>
 
-<div class="col-sm-12 col-lg-4">
-
-    <textarea id="txtCounter" style="width:100%" rows="5" placeholder="カウントする文字を入力してください" class="mb-2"></textarea>
-
+    <div id="messageArea"></div>
 </div>
-
 
 {% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    var storeData = [];
+    var storeIndex = 0;
+
+    $('#btnReplaceOne').click(function() {
+            $('#messageArea').html("");
+            var data = $('#baseText').val();
+            if(data.trim() == "") {
+                alert("対象の文字列を入力してください");
+                return false;
+            }
+            var findWhat = $('#inputBefore').val();
+            if(findWhat.trim() == "") {
+                alert("検索する文字列を入力してください");
+                return false;
+            }
+
+            var cursorPosition = $('#baseText').prop("selectionEnd");
+            var caseSensitive = $("#cbCaseSensitive:checked").length;
+            
+            if(caseSensitive === 0) {
+                data = data.toLowerCase();
+                findWhat = findWhat.toLowerCase();
+            }
+            if(cursorPosition <= 0) {
+                cursorPosition = 0;
+                position = data.indexOf(findWhat);
+            } else {
+                dataSubstr = data.substring(cursorPosition, data.length);
+                position = dataSubstr.indexOf(findWhat);
+                if(position >= 0) {
+                    position += cursorPosition;
+                } else {
+                    position = data.indexOf(findWhat);
+                    if(position < 0) {
+                        $('#messageArea').append("<div class='error'>一致する文字列が見つかりません</div>");
+                        return false;
+                    }
+                }
+            }
+            rangeTo = position + findWhat.length;
+                
+            createRangeSelect(position, rangeTo);
+            var textarea = document.getElementById("baseText");
+            line = getCurrentLine(textarea);
+            scrollToLine(line);
+        });
+
+        $('#btnReplaceDo').click(function() {
+            $('#messageArea').html("");
+            var textarea = document.getElementById('baseText');
+            var start = textarea.selectionStart;
+            var end = textarea.selectionEnd;
+            if(start != end) {
+                var data = textarea.value;
+                var dataReplace = $('#inputAfter').val();
+                let selectedVal = textarea.value.slice(start, end);
+                var result = data.slice(0, start) + dataReplace + data.slice(end);
+
+                $('#baseText').val(result);
+                createRangeSelect(start, start + dataReplace.length);
+
+
+                if (data !== storeData[storeData.length-1]) {
+                saveData(data);
+                }
+                if (result !== data) {
+                    saveData(result);
+                }
+            } else {
+                alert('置換する文字列を検索または選択してください');
+                return false;
+            }
+        });
+
+     $('#btnReplaceAll').click(function() {
+            $('#messageArea').html("");
+            var data = $('#baseText').val();
+            var findWhat = $('#inputBefore').val();
+            if(findWhat.trim() == "") {
+                alert("検索する文字列を入力してください");
+                return false;
+            }
+            var replaceWith = $('#inputAfter').val();
+            var caseSensitive = $("#cbCaseSensitive:checked").length;
+       
+            if(caseSensitive === 1) {
+                regExp = new RegExp(escapeRegExp(findWhat), "g");
+            } else if(caseSensitive === 0){
+                regExp = new RegExp(escapeRegExp(findWhat), "gi");
+            } 
+
+            checkMatch = regExp.exec(data);
+            if(checkMatch != null) {
+                result = replaceAll(data, regExp, replaceWith);
+                $('#baseText').val(result);
+            } else {
+                $('#messageArea').append('<div class="error">一致する文字列が見つかりません</div>')
+                return false;
+            }
+
+            //save Data
+            if (data !== storeData[storeData.length-1]) {
+                saveData(data);
+            }
+            if (result !== data) {
+                saveData(result);
+            }
+        });
+
+        $('#btnNextData').click(function() {
+            if ( storeIndex < storeData.length-1){
+                storeIndex++;
+                $('#baseText').val(storeData[storeIndex]);
+                //initButton();
+            }
+        });
+
+        $('#btnPreData').click(function() {
+            if (storeIndex != 0){
+                storeIndex--;
+                $('#baseText').val(storeData[storeIndex]);
+            }
+            //$('#btnNextData').removeAttr("disabled");
+            //$('#btnNextData').removeClass("blockCursor");
+            //initButton();
+
+        });
+
+        $('#btnResetData').click(function() {
+            var resetVal = storeData[0];
+            if (resetVal !== storeData[storeData.length - 1]) {
+                storeData.push(resetVal);
+            }
+            $('#baseText').val(resetVal);
+            storeIndex = storeData.length - 1;
+            //disableNextEnablePre();
+        });
+
+    function createRangeSelect(start, end) {
+        let selection = document.getElementById('baseText');  
+        selection.setSelectionRange(start, end);
+        selection.focus();
+    }
+
+    function getCurrentLine(textarea) {
+        return textarea.value.substr(0, textarea.selectionStart).split(/\r?\n/).length;
+    }
+
+    function scrollToLine(line) {
+        var textarea = document.getElementById("baseText");
+        var jump = (line - 1) * parseInt(getStyle(textarea, 'line-height'), 10);
+        textarea.scrollTop = jump;
+    }
+
+    function getStyle(el, styleProp) {
+        if (el.currentStyle) {
+            var y = el.currentStyle[styleProp];
+        } else if (window.getComputedStyle) {
+            var y = document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
+        }
+        return y;
+    }
+
+    function saveData(data) {
+        storeData.push(data);
+        storeIndex = storeData.length - 1;
+        //disableNextEnablePre();
+        //$('#btnResetData').removeAttr("disabled");
+        //$('#btnResetData').removeClass("blockCursor");
+    }
+
+    function disableNextEnablePre () {
+        $('#btnNextData').attr("disabled", true);
+        $('#btnNextData').addClass("blockCursor");
+        $('#btnPreData').removeAttr("disabled");
+        $('#btnPreData').removeClass("blockCursor");
+    }
+    
+    function replaceAll(str, regExp, replace) {
+        return str.replace(regExp, replace);
+    }
+
+    function escapeRegExp(str) {
+        return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    }
+</script>
+{% endblock %}
+
+
 
 {% block url %}url: "{% url 'whois' %}",{% endblock %}

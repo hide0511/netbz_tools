@@ -9,6 +9,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <script src="{% static 'js/main.js' %}"></script>
     <title>{% block title %}{% endblock %}</title>
   </head>
   <body>
@@ -48,7 +49,7 @@
 
     <script>
         $('#button1').on('click', function(){
-            dispLoading("処理中...この処理には数分かかることもあります");
+            dispLoading("処理中...この処理には数分かかることがあります");
 
             // Ajax通信を開始
             $.ajax({
@@ -68,7 +69,7 @@
             })
             .fail(function() {
                 // 通信失敗時の処理を記述
-                $('#resultGET').text('GET処理失敗.');
+                $('#resultGET').text('処理が失敗しました。時間をおいて再度お試しください。');
             })
             .always( function(data) {
                 // Loading 画像を消す
@@ -96,7 +97,7 @@
         ------------------------------ */
         function removeLoading(){
         $("#nowLoading").remove();
-        }  
+        }
     </script>
 
 
