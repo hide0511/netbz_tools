@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+アニメーションボタン作成
+{% endblock %}
+{% block content %}
+<div class="col-sm-12 col-lg-9">
+
+    <h2>入力フォーム</h2>
+    <div id="cntFormArea" class="kakomu mb-3">
+        <p class="mt-2">アニメーションの種類（下記サンプルを参照に選んでください）</p>
+        <select id="animation" name="animation" class="mb-2">
+        <option value="ani1">左右の揺れ</option>
+        <option value="ani2">拡大縮小</option>
+        <option value="ani3">波動</option>
+        <option value="ani4">ジャンプ</option>
+        <option value="ani5">ガタガタの揺れ</option>
+        </select>
+        <p class="mt-2">ボタンをクリックした際のリンク先のURL</p>
+        <input id="href_url" class="form-control mb-2" type="text" name="href_url">
+        <p class="mt-2">ボタン画像のURL</p>
+        <input id="img_url" class="form-control mb-2" type="text" name="img_url">
+
+        <button id="btnCreate" class="m-3 btn btn-primary">コード生成</button>
+    </div>
+
+    <h2>出力結果</h2>
+    <P>※出力されたHTMLタグ、CSSコードをコピーして使用してください。</p>
+    <div id="cntResultArea" class="kakomu mb-3">
+        <div class="btn-toolbar">
+            <div class="btn-group">
+                <h3>HTMLタグ</h3>
+            </div>
+            <div class="btn-group ml-auto">
+                <button id="btnCopyHtml" class="m-3 btn btn-primary">コピー</button>
+            </div>
+        </div>
+        <textarea readonly id="txtHtml" style="width:100%" rows="2" placeholder="出力されたHTMLタグをコピーして使用してください。" class="mb-2"></textarea>
+
+        <div class="btn-toolbar">
+            <div class="btn-group">
+                <h3>CSSコード</h3>
+            </div>
+            <div class="btn-group ml-auto">
+                <button id="btnCopyCss" class="m-3 btn btn-primary">コピー</button>
+            </div>
+        </div>
+        <textarea readonly id="txtCss" style="width:100%" rows="15" placeholder="出力されたCSSコードをコピーして使用してください。" class="mb-2"></textarea>
+
+    </div>
+
+    <h2>サンプル</h2>
+    <P>※カーソルを合わせるとアニメーションは停止します。</p>
+    <div id="SampleArea">
+        <h3>基本画像</h3>
+        <p>アニメーション効果を加えていない元画像です。</p>
+        <div><a class="a-btn" href="http://yahoo.co.jp" data-id="hd001"><img src="{% static 'img/btn.png' %}" width="100%" class="a-main" /></a></div>
+        <h3>左右の揺れ</h3>
+        <p>ボタンが左右に揺れます。</p>
+        <div><a class="a-btn a-btnhd001 shover" href="http://yahoo.co.jp" data-id="hd001"><img class="a-main animate animatehd001" src="{% static 'img/btn.png' %}" /></a></div>
+        <h3>拡大収縮</h3>
+        <p>ボタンが大きくなったり小さくなったり変化します。</p>
+        <div><a class="a-btn a-btnhd002 shover" href="http://yahoo.co.jp" data-id="hd002"><img class="a-main animate animatehd002" src="{% static 'img/btn.png' %}" /></a></div>
+        <h3>波紋</h3>
+        <p>ボタンから波紋のような物が現れます。</p>
+        <div>
+        <a class="a-btn a-btnhd003 shover" href="http://yahoo.co.jp" data-id="hd003"><img class="a-main animate animatehd003" src="{% static 'img/btn.png' %}"><span class="a-btnsub a-btnsubhd003 color" style="color: rgb(53, 228, 66); background-color: rgb(56, 239, 123);"></span></a>
+        </div>
+        <h3>ジャンプ</h3>
+        <p>ボタンがジャンプします。</p>
+        <div><a class="a-btn a-btnhd004 shover" href="http://yahoo.co.jp" data-id="hd004"><img class="a-main animate animatehd004" src="{% static 'img/btn.png' %}" /></a></div>
+        <h3>ガタガタの揺れ</h3>
+        <p>ボタンがガタガタと揺れます。</p>
+        <div><a class="a-btn a-btnhd005 shover" href="http://yahoo.co.jp" data-id="hd005"><img class="a-main animate animatehd005" src="{% static 'img/btn.png' %}" /></a></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+
+    $('#animation').change(function() {
+        clearText();
+    });
+
+    $('#btnCreate').click(function() {
+            const num = document.getElementById("animation").selectedIndex;
+            clearText();
+            //$('#cntResultArea').html("");
+            
+            var href_url = $('#href_url').val();
+            var img_url = $('#img_url').val();
+
+            href_url = href_url.trim();
+            img_url = img_url.trim();
+
+            if(href_url == "") {
+                alert("リンク先URLを入力してください");
+                return false;
+            }    
+            if(img_url == "") {
+                alert("画像URLを入力してください");
+                return false;
+            }    
+
+            var htmllist = [];
+            htmllist.push('<a class="a-btn a-btnhd001 shover" href="' + href_url + '" data-id="hd001"><img class="a-main animate animatehd001" src="' + img_url + '" /></a>');
+            htmllist.push('<a class="a-btn a-btnhd002 shover" href="' + href_url + '" data-id="hd002"><img class="a-main animate animatehd002" src="' + img_url + '" /></a>');
+            htmllist.push('<a class="a-btn a-btnhd003 shover" href="' + href_url + '" data-id="hd003"><img class="a-main animate animatehd003" src="' + img_url + '"><span class="a-btnsub a-btnsubhd003 color" style="color: rgb(53, 228, 66); background-color: rgb(56, 239, 123);"></span></a>');
+            htmllist.push('<a class="a-btn a-btnhd004 shover" href="' + href_url + '" data-id="hd004"><img class="a-main animate animatehd004" src="' + img_url + '" /></a>');
+            htmllist.push('<a class="a-btn a-btnhd005 shover" href="' + href_url + '" data-id="hd005"><img class="a-main animate animatehd005" src="' + img_url + '" /></a>');
+ 
+            $('#txtHtml').val(htmllist[num]);
+
+            var csslist = [];
+            csslist.push('.animatehd001,.a-optionhd001,.a-btnsubhd001 {-webkit-animation-timing-function: ease-in;-moz-animation-timing-function: ease-in;-o-animation-timing-function: ease-in;animation-timing-function: ease-in;-moz-animation-iteration-count: infinite;-webkit-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;-ms-animation-iteration-count: infinite;animation-iteration-count: infinite;}a.a-btn {position:relative;display:inline-block;margin:auto;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;}a.a-btn img {display: block;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;}img.a-main {width:100%;position:relative;z-index: 54;}a.shover:hover * {animation-name:none!important;}@-moz-keyframes animatehd001 {0%{ -moz-transform:rotate(0deg);}40%{ -moz-transform:rotate(0deg);}50%{ -moz-transform:rotate(2deg);}60%{ -moz-transform:rotate(-1deg);}70%{ -moz-transform:rotate(3deg);}80%{ -moz-transform:rotate(-2deg);}90%{ -moz-transform:rotate(0deg);}100%{ -moz-transform:rotate(0deg);}}@-o-keyframes animatehd001 {0%{ -o-transform:rotate(0deg);}40%{ -o-transform:rotate(0deg);}50%{ -o-transform:rotate(2deg);}60%{ -o-transform:rotate(-1deg);}70%{ -o-transform:rotate(3deg);}80%{ -o-transform:rotate(-2deg);}90%{ -o-transform:rotate(0deg);}100%{ -o-transform:rotate(0deg);}}@-webkit-keyframes animatehd001 {0%{ -webkit-transform:rotate(0deg);}40%{ -webkit-transform:rotate(0deg);}50%{ -webkit-transform:rotate(2deg);}60%{ -webkit-transform:rotate(-1deg);}70%{ -webkit-transform:rotate(3deg);}80%{ -webkit-transform:rotate(-2deg);}90%{ -webkit-transform:rotate(0deg);}100%{ -webkit-transform:rotate(0deg);}}@keyframes animatehd001 {0%{ transform:rotate(0deg);}40%{ transform:rotate(0deg);}50%{ transform:rotate(2deg);}60%{ transform:rotate(-1deg);}70%{ transform:rotate(3deg);}80%{ transform:rotate(-2deg);}90%{ transform:rotate(0deg);}100%{ transform:rotate(0deg);}}.animatehd001{-webkit-animation-name: animatehd001;-moz-animation-name: animatehd001;-o-animation-name: animatehd001;animation-name: animatehd001;}.a-btnhd001{padding-left:0%!important;}.a-optionhd001{top:0%!important;}.a-optionhd001{width:20%!important;}.a-btnhd001{max-width:96%!important;}.animatehd001,.a-btnsubhd001,.a-optionhd001{animation-duration:1.1s!important;-webkit-animation-duration:1.1s;-ms-animation-duration:1.1s;-moz-animation-duration:1.1s!important;}');
+            csslist.push('.animatehd002,.a-optionhd002,.a-btnsubhd002 {-webkit-animation-timing-function: ease-in;-moz-animation-timing-function: ease-in;-o-animation-timing-function: ease-in;animation-timing-function: ease-in;-moz-animation-iteration-count: infinite;-webkit-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;-ms-animation-iteration-count: infinite;animation-iteration-count: infinite;}a.a-btn {position:relative;display:inline-block;margin:auto;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;}a.a-btn img {display: block;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;}img.a-main {width:100%;position:relative;z-index: 54;}a.shover:hover * {animation-name:none!important;}@-moz-keyframes animatehd002 {0%{ -moz-transform:scale(0.92);}40%{ -moz-transform:scale(0.97);}60%{ -moz-transform:scale(0.86);}80%{ -moz-transform:scale(1);}100%{ -moz-transform:scale(0.92);}}@-o-keyframes animatehd002 {0%{ -o-transform:scale(0.92);}40%{ -o-transform:scale(0.97);}60%{ -o-transform:scale(0.86);}80%{ -o-transform:scale(1);}100%{ -o-transform:scale(0.92);}}@-webkit-keyframes animatehd002 {0%{ -webkit-transform:scale(0.92);}40%{ -webkit-transform:scale(0.97);}60%{ -webkit-transform:scale(0.86);}80%{ -webkit-transform:scale(1);}100%{ -webkit-transform:scale(0.92);}}@keyframes animatehd002 {0%{ transform:scale(0.92);}40%{ transform:scale(0.97);}60%{ transform:scale(0.86);}80%{ transform:scale(1);}100%{ transform:scale(0.92);}}.animatehd002{-webkit-animation-name: animatehd002;-moz-animation-name: animatehd002;-o-animation-name: animatehd002;animation-name: animatehd002;}.a-btnhd002{padding-left:0%!important;}.a-optionhd002{top:0%!important;}.a-optionhd002{width:20%!important;}.a-btnhd002{max-width:98%!important;}.animatehd002,.a-btnsubhd002,.a-optionhd002{animation-duration:1.3s!important;-webkit-animation-duration:1.3s;-ms-animation-duration:1.3s;-moz-animation-duration:1.3s!important;}');
+            csslist.push('.animatehd003,.a-optionhd003,.a-btnsubhd003 {-webkit-animation-timing-function: ease-in;-moz-animation-timing-function: ease-in;-o-animation-timing-function: ease-in;animation-timing-function: ease-in;-moz-animation-iteration-count: infinite;-webkit-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;-ms-animation-iteration-count: infinite;animation-iteration-count: infinite;}a.a-btn {position:relative;display:inline-block;margin:auto;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;}a.a-btn img {display: block;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;}img.a-main {width:100%;position:relative;z-index: 54;}a.shover:hover * {animation-name:none!important;}@-moz-keyframes subhd003 {0%{ -moz-transform:scale(0.9);box-shadow: 0 0 0 1px;opacity:0;}50%{ -moz-transform:scale(1);box-shadow: 0 0 0 10px;opacity:0.4;}100%{ -moz-transform:scale(1.2);box-shadow: 0 0 0 20px;opacity:0;}}@-o-keyframes subhd003 {0%{ -o-transform:scale(0.9);box-shadow: 0 0 0 1px;opacity:0;}50%{ -o-transform:scale(1);box-shadow: 0 0 0 10px;opacity:0.4;}100%{ -o-transform:scale(1.2);box-shadow: 0 0 0 20px;opacity:0;}}@-webkit-keyframes subhd003 {0%{ -webkit-transform:scale(0.9);box-shadow: 0 0 0 1px;opacity:0;}50%{ -webkit-transform:scale(1);box-shadow: 0 0 0 10px;opacity:0.4;}100%{ -webkit-transform:scale(1.2);box-shadow: 0 0 0 20px;opacity:0;}}@keyframes subhd003 {0%{ transform:scale(0.9);box-shadow: 0 0 0 1px;opacity:0;}50%{ transform:scale(1);box-shadow: 0 0 0 10px;opacity:0.4;}100%{ transform:scale(1.2);box-shadow: 0 0 0 20px;opacity:0;}}.a-btnsubhd003{-webkit-animation-name: subhd003;-moz-animation-name: subhd003;-o-animation-name: subhd003;animation-name: subhd003;}.a-btnsubhd003 {content:"";position: absolute;top: 0;left: 0;width: 100%;height: 100%;box-shadow: 0 0 0 1px rgba(233,88,91,0);opacity:0;color:#c00;}.a-btnhd003{padding-left:0%!important;}.a-optionhd003{top:0%!important;}.a-optionhd003{width:20%!important;}.a-btnhd003{max-width:100%!important;}.animatehd003,.a-btnsubhd003,.a-optionhd003{animation-duration:0.9s!important;-webkit-animation-duration:0.9s;-ms-animation-duration:0.9s;-moz-animation-duration:0.9s!important;}');
+            csslist.push('.animatehd004,.a-optionhd004,.a-btnsubhd004 {-webkit-animation-timing-function: ease-in;-moz-animation-timing-function: ease-in;-o-animation-timing-function: ease-in;animation-timing-function: ease-in;-moz-animation-iteration-count: infinite;-webkit-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;-ms-animation-iteration-count: infinite;animation-iteration-count: infinite;}a.a-btn {position:relative;display:inline-block;margin:auto;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;}a.a-btn img {display: block;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;}img.a-main {width:100%;position:relative;z-index: 54;}a.shover:hover * {animation-name:none!important;}@-moz-keyframes animatehd004 {0%{ -moz-transform:translateY(0);}20%{ -moz-transform:translateY(0);bottom: 5px;}30%{ -moz-transform:translateY(-20%) scale(1.1);}40%{ -moz-transform:translateY(0%) scale(1.0);bottom: 6px;}50%{ -moz-transform:translateY(-16%) scale(1.05);}70%{ -moz-transform:translateY(0%);bottom: 7px;}80%{ -moz-transform:translateY(-5%) scale(1.01);}90%{ -moz-transform:translateY(-1%) scale(1.0);bottom:9px;}100%{ -moz-transform:translateY(0);bottom:0;}}@-o-keyframes animatehd004 {0%{ -o-transform:translateY(0);}20%{ -o-transform:translateY(0);bottom: 5px;}30%{ -o-transform:translateY(-20%) scale(1.1);}40%{ -o-transform:translateY(0%) scale(1.0);bottom: 6px;}50%{ -o-transform:translateY(-16%) scale(1.05);}70%{ -o-transform:translateY(0%);bottom: 7px;}80%{ -o-transform:translateY(-5%) scale(1.01);}90%{ -o-transform:translateY(-1%) scale(1.0);bottom:9px;}100%{ -o-transform:translateY(0);bottom:0;}}@-webkit-keyframes animatehd004 {0%{ -webkit-transform:translateY(0);}20%{ -webkit-transform:translateY(0);bottom: 5px;}30%{ -webkit-transform:translateY(-20%) scale(1.1);}40%{ -webkit-transform:translateY(0%) scale(1.0);bottom: 6px;}50%{ -webkit-transform:translateY(-16%) scale(1.05);}70%{ -webkit-transform:translateY(0%);bottom: 7px;}80%{ -webkit-transform:translateY(-5%) scale(1.01);}90%{ -webkit-transform:translateY(-1%) scale(1.0);bottom:9px;}100%{ -webkit-transform:translateY(0);bottom:0;}}@keyframes animatehd004 {0%{ transform:translateY(0);}20%{ transform:translateY(0);bottom: 5px;}30%{ transform:translateY(-20%) scale(1.1);}40%{ transform:translateY(0%) scale(1.0);bottom: 6px;}50%{ transform:translateY(-16%) scale(1.05);}70%{ transform:translateY(0%);bottom: 7px;}80%{ transform:translateY(-5%) scale(1.01);}90%{ transform:translateY(-1%) scale(1.0);bottom:9px;}100%{ transform:translateY(0);bottom:0;}}.animatehd004{-webkit-animation-name: animatehd004;-moz-animation-name: animatehd004;-o-animation-name: animatehd004;animation-name: animatehd004;}.animatehd004 {position:relative;}.a-btnhd004{padding-left:0%!important;}.a-optionhd004{top:0%!important;}.a-optionhd004{width:20%!important;}.a-btnhd004{max-width:100%!important;}.animatehd004,.a-btnsubhd004,.a-optionhd004{animation-duration:1.4s!important;-webkit-animation-duration:1.4s;-ms-animation-duration:1.4s;-moz-animation-duration:1.4s!important;}');
+            csslist.push('.animatehd005,.a-optionhd005,.a-btnsubhd005 {-webkit-animation-timing-function: ease-in;-moz-animation-timing-function: ease-in;-o-animation-timing-function: ease-in;animation-timing-function: ease-in;-moz-animation-iteration-count: infinite;-webkit-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;-ms-animation-iteration-count: infinite;animation-iteration-count: infinite;}a.a-btn {position:relative;display:inline-block;margin:auto;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;}a.a-btn img {display: block;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;}img.a-main {width:100%;position:relative;z-index: 54;}a.shover:hover * {animation-name:none!important;}@-moz-keyframes animatehd005 {0%{ -moz-transform: translate(0,0) rotate(0deg);}10%{ -moz-transform: translate(-1px, -2px) rotate(-0.5deg);}20%{ -moz-transform: translate(-2px, 0px) rotate(0.5deg);}30%{ -moz-transform: translate(0px, 2px) rotate(0deg);}40%{ -moz-transform: translate(1px, -1px) rotate(0.5deg);}50%{ -moz-transform: translate(-1px, 2px) rotate(-0.5deg);}60%{ -moz-transform: translate(-2px, 1px) rotate(0deg);}70%{ -moz-transform: translate(2px, 1px) rotate(-1deg);}80%{ -moz-transform: translate(-1px, -1px) rotate(1deg);}90%{ -moz-transform: translate(1px, 2px) rotate(-1deg);}100%{ -moz-transform: translate(0,0) rotate(0deg);}}@-o-keyframes animatehd005 {0%{ -o-transform: translate(0,0) rotate(0deg);}10%{ -o-transform: translate(-1px, -2px) rotate(-0.5deg);}20%{ -o-transform: translate(-2px, 0px) rotate(0.5deg);}30%{ -o-transform: translate(0px, 2px) rotate(0deg);}40%{ -o-transform: translate(1px, -1px) rotate(0.5deg);}50%{ -o-transform: translate(-1px, 2px) rotate(-0.5deg);}60%{ -o-transform: translate(-2px, 1px) rotate(0deg);}70%{ -o-transform: translate(2px, 1px) rotate(-1deg);}80%{ -o-transform: translate(-1px, -1px) rotate(1deg);}90%{ -o-transform: translate(1px, 2px) rotate(-1deg);}100%{ -o-transform: translate(0,0) rotate(0deg);}}@-webkit-keyframes animatehd005 {0%{ -webkit-transform: translate(0,0) rotate(0deg);}10%{ -webkit-transform: translate(-1px, -2px) rotate(-0.5deg);}20%{ -webkit-transform: translate(-2px, 0px) rotate(0.5deg);}30%{ -webkit-transform: translate(0px, 2px) rotate(0deg);}40%{ -webkit-transform: translate(1px, -1px) rotate(0.5deg);}50%{ -webkit-transform: translate(-1px, 2px) rotate(-0.5deg);}60%{ -webkit-transform: translate(-2px, 1px) rotate(0deg);}70%{ -webkit-transform: translate(2px, 1px) rotate(-1deg);}80%{ -webkit-transform: translate(-1px, -1px) rotate(1deg);}90%{ -webkit-transform: translate(1px, 2px) rotate(-1deg);}100%{ -webkit-transform: translate(0,0) rotate(0deg);}}@keyframes animatehd005 {0%{ transform: translate(0,0) rotate(0deg);}10%{ transform: translate(-1px, -2px) rotate(-0.5deg);}20%{ transform: translate(-2px, 0px) rotate(0.5deg);}30%{ transform: translate(0px, 2px) rotate(0deg);}40%{ transform: translate(1px, -1px) rotate(0.5deg);}50%{ transform: translate(-1px, 2px) rotate(-0.5deg);}60%{ transform: translate(-2px, 1px) rotate(0deg);}70%{ transform: translate(2px, 1px) rotate(-1deg);}80%{ transform: translate(-1px, -1px) rotate(1deg);}90%{ transform: translate(1px, 2px) rotate(-1deg);}100%{ transform: translate(0,0) rotate(0deg);}}.animatehd005{-webkit-animation-name: animatehd005;-moz-animation-name: animatehd005;-o-animation-name: animatehd005;animation-name: animatehd005;}.a-btnhd005{padding-left:0%!important;}.a-optionhd005{top:0%!important;}.a-optionhd005{width:20%!important;}.a-btnhd005{max-width:100%!important;}.animatehd005,.a-btnsubhd005,.a-optionhd005{animation-duration:0.8s!important;-webkit-animation-duration:0.8s;-ms-animation-duration:0.8s;-moz-animation-duration:0.8s!important;}');
+
+            $('#txtCss').val(csslist[num]);
+
+   });
+   $('#btnCopyHtml').click(function() {
+        copyText('txtHtml');
+   });
+   $('#btnCopyCss').click(function() {
+        copyText('txtCss');
+   });
+
+    function copyText(id){
+        var txt = document.getElementById(id);
+        txt.select();
+        document.execCommand("Copy");
+    }
+
+    function clearText(){
+
+        $('#txtHtml').val("");
+        $('#txtCss').val("");
+    }
+
+</script>
+{% endblock %}
+
+{% block url %}url: "{% url 'suggest' %}",{% endblock %}

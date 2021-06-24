@@ -14,16 +14,23 @@
             </div>
             <div class="DivLink mb-3">
                 <div class="p-2">
-                    <p><span class = "top-title">■推奨文字数</span></p>
-                    <p>指定したキーワードで記事を書く場合の推奨文字数を調査します。</p>
-                    <a class ="Link" href="{% url 'chrcount' %}"></a>
+                    <p><span class = "top-title">■ライバル見出し調査</span></p>
+                    <p>指定したキーワードで上位表示されているサイトの見出しを一括で抽出します。</p>
+                    <a class ="Link" href="{% url 'heading' %}"></a>
                 </div>
             </div>
             <div class="DivLink mb-3">
                 <div class="p-2">
-                    <p><span class = "top-title">■ライバル見出し調査</span></p>
-                    <p>指定したキーワードで上位表示されているサイトの見出しを一括で抽出します。</p>
-                    <a class ="Link" href="{% url 'heading' %}"></a>
+                    <p><span class = "top-title">■アニメーションボタン生成</span></p>
+                    <p>アニメーションボタンを作成するコードを生成します。</p>
+                    <a class ="Link" href="{% url 'animbutton' %}"></a>
+                </div>
+            </div>
+            <div class="DivLink mb-3">
+                <div class="p-2">
+                    <p><span class = "top-title">■推奨文字数カリキュレーター</span></p>
+                    <p>指定したキーワードで記事を書く場合の推奨文字数を算出します。</p>
+                    <a class ="Link" href="{% url 'chrcount' %}"></a>
                 </div>
             </div>
             <div class="DivLink mb-3">
@@ -44,13 +51,6 @@
             </div>
             <div class="DivLink mb-3">
                 <div class="p-2">
-                    <p><span class = "top-title">■虫眼鏡キーワード＋広告</span></p>
-                    <p>指定したキーワードに対するヤフーの虫眼鏡キーワードと広告を表示します。</p>
-                    <a class ="Link" href="{% url 'suggest' %}"></a>
-                </div>
-            </div>
-            <div class="DivLink mb-3">
-                <div class="p-2">
                     <p><span class = "top-title">■文字列の置き換え</span></p>
                     <p>任意の文字列を一括、あるいは１つずつ確認しながら置き換えます。</p>
                     <a class ="Link" href="{% url 'replace' %}"></a>
@@ -61,6 +61,13 @@
                     <p><span class = "top-title">■頻出ワード調査</span></p>
                     <p>指定したキーワードに対する頻出ワードを調査します。</p>
                     <a class ="Link" href="{% url 'frequent' %}"></a>
+                </div>
+            </div>
+            <div class="DivLink mb-3">
+                <div class="p-2">
+                    <p><span class = "top-title">■虫眼鏡キーワード＋広告</span></p>
+                    <p>指定したキーワードに対するヤフーの虫眼鏡キーワードと広告を表示します。</p>
+                    <a class ="Link" href="{% url 'suggest' %}"></a>
                 </div>
             </div>
         </div>

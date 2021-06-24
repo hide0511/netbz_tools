@@ -31,11 +31,17 @@ import base64
 class IndexView(TemplateView):
     template_name = 'index.html'
 
+class AnimButton(TemplateView):
+    template_name = "animbutton.html"
+
 class ReplaceView(TemplateView):
     template_name = "replace.html"
 
 class RealTimeCntView(TemplateView):
     template_name = "realtimecnt.html"
+
+class YahooKeywordView(TemplateView):
+    template_name = "yahookeyword.html"
 
 class FrequentWordView(TemplateView):
     template_name = "frequent.html"

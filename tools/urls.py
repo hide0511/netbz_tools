@@ -11,4 +11,5 @@ urlpatterns = [
     path('whois/',views.WhoIsView.as_view(),name='whois'),
     path('replace/',views.ReplaceView.as_view(),name='replace'),
     path('frequent/',views.FrequentWordView.as_view(),name='frequent'),
+    path('animbutton/',views.AnimButton.as_view(),name='animbutton'),
 ]

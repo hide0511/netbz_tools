@@ -9,6 +9,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <link href="{% static 'css/button.css' %}" rel="stylesheet">
     <script src="{% static 'js/main.js' %}"></script>
     <title>{% block title %}{% endblock %}</title>
   </head>
@@ -30,13 +31,15 @@
         <div class="col-sm-12 col-lg-3">
             <h3>リンク</h3>
             <p><a href="{% url 'index' %}">トップページ</a></p>
-            <p>リアルタイム文字カウンター</p>
-            <p>関連キーワードチェッカー</p>
-            <p>推奨文字数</p>
-            <p>虫眼鏡キーワード＋広告</p>
-            <p>ライバル見出し調査</p>
-            <p>文字列の書き換え</p>
-            <p>Whois調査</p>
+            <p><a href="{% url 'realtimecnt' %}">リアルタイム文字カウンター</a></p>
+            <p><a href="{% url 'animbutton' %}">アニメーションボタン</a></p>
+            <p><a href="{% url 'suggest' %}">関連キーワードチェッカー</a></p>
+            <p><a href="{% url 'chrcount' %}">推奨文字数カリキュレーター</a></p>
+            <p><a href="{% url 'heading' %}">ライバル見出し調査</a></p>
+            <p><a href="{% url 'replace' %}">文字列の書き換え</a></p>
+            <p><a href="{% url 'whois' %}">Whois調査</a></p>
+            <p><a href="{% url 'frequent' %}">頻出ワード調査</a></p>
+            <p><a href="{% url 'replace' %}">虫眼鏡キーワード＋広告</a></p>
         </div>
     </div>
 </div>
@@ -61,7 +64,7 @@
                 data: {
                     param1: $('#input_data').val()
                 },
-                timeout: 120000,
+                timeout: 180000,
             })
             .done(function(data) {
                 // 通信成功時の処理を記述

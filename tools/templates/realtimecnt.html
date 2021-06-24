@@ -12,8 +12,10 @@
 
     <div id="cntFormArea">
 
-        <textarea id="txtCounter" cols="80" rows="5" placeholder="カウントする文字を入力してください" class="mb-2"></textarea>
-        <div class="reset_btn"><button class="white_btn" id="btnReset">リセット</button></div>
+        <textarea id="txtCounter" cols="80" rows="8" placeholder="カウントする文字を入力してください" class="mb-2"></textarea>
+        <div><button id="btnReset" class="mb-3 btn btn-primary">リセット</button></div>
+
+<!--
         <div class="mt-3">
             <p class="mb-2">
                 <label>
@@ -31,15 +33,26 @@
                 </label>
             </p>
         </div>
-    </div>
-    <div id="cntResultArea">
-        <!-- 文字数（文前後の空白なし）
-        <div class="result_label_important">■文字数（文前後の空白なし）</div>
-        <p <span class="result_label_important">■文字数（空白込み）：</span><span id="cntResult" class="important">0</span></p>
-        <p><span class="result_label">■文字数（空白なし）：</span><span id="cntResultRemoveAllSpace" class="result_cnt">0</span></p>
-        <p><span class="result_label">■行数（空白行込み）：</span><span id="cntResultLineSpace" class="result_cnt">0</span></p>
-        その他 -->
-        
+-->
+
+        <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="checkRemoveSpace" checked="checked">
+        <label class="form-check-label" for="checkRemoveSpace">
+            空白、空行を含めない
+        </label>
+        </div>
+        <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="checkRemoveHtml">
+        <label class="form-check-label" for="checkRemoveHtml">
+            htmlコードを含めない
+        </label>
+        </div>
+        <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="checkRemoveComma">
+        <label class="form-check-label" for="checkRemoveComma">
+            句読点を含めない
+        </label>
+        </div>
 
     </div>
 </div>
