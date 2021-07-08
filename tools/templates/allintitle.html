@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}
+allititleリンクメーカー
+{% endblock %}
+{% block content %}
+<div class="col-sm-12 col-lg-9">
+
+    <h2 class="mb-3">allititleリンクメーカー</h2>
+
+    <textarea id="txtKeyword" style="width:100%" rows="12" placeholder="キーワードを入力してください" class="mb-2"></textarea>
+    <div class="btn-toolbar">
+        <div class="btn-group">
+            <button id="btnMake" class="m-3 btn btn-primary">リンク作成</button>
+            <button id="btnClear" class="m-3 btn btn-primary">クリア</button>
+        </div>
+        <div class="btn-group ml-auto">
+            <button id="btnCsvDownload" class="m-3 btn btn-info">結果をファイルに保存する</button>
+        </div>
+    </div>
+    <div id="resultGET"></div>
+
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+
+        $(function() {
+            $('#txtKeyword').keyup(function() {
+                if (event.keyCode === 13 && event.ctrlKey) {
+                    event.preventDefault();
+                    document.getElementById("btnMake").click();
+                }
+            });
+
+            $('#btnMake').click(function() {
+                var keywords = $('#txtKeyword').val();
+                if(keywords.trim().length > 0){
+                    openkeywords(keywords.trim());
+                }else{
+                    alert("キーワードを入力してください");
+                    return false;
+                }
+            })
+
+            $('#btnClear').click(function() {
+                clearText('txtKeyword');
+                $('#resultGET').html('');
+            })
+
+
+            $('#btnCsvDownload').click(function() {
+
+                var data = "";
+
+                var li01 = document.getElementsByTagName('li');
+
+                if(li01.length == 0){
+                    alert("ダウンロードするデータがありません。");
+                    return;
+                }
+
+                for (var i = 0; i < li01.length; i++) {
+                    var kw = li01[i].getElementsByClassName('allinkeyword');
+                    var lk = li01[i].getElementsByClassName('allinlink');
+                    data = data + String(i)+ "," + kw[0].textContent + ",https://www.google.co.jp/search?"  + lk[0].textContent + "\n" ;
+                }
+
+
+
+                saveCsvFile(data);
+            });
+           
+
+        });
+
+        function openkeywords(keywords) {
+                var text  = document.getElementById('txtKeyword').value.replace(/\r\n|\r/g, "\n");
+                var lines = text.split( '\n' );
+                var outArray = new Array();
+            
+                for ( var i = 0; i < lines.length; i++ ) {
+                    // 空行は無視する
+                    if ( lines[i] == '' ) {
+                        continue;
+                    }
+                    allintitlelink = '<li><span class="allinkeyword">' + lines[i] + '</span><br><span class="allinlink" >q=allintitle%3A' + encodeURI(lines[i]) + '&hl=ja&pws=0&complete=0</span></li>';
+                    outArray.push(allintitlelink);
+                }
+                $('#resultGET').html('<ul>' + outArray.join('') + '</ul>');
+        }
+ 
+        function clearText(id) {
+            $('#'+id).val(null).focus();
+        }
+
+
+</script>
+{% endblock %}
+

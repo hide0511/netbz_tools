@@ -27,7 +27,8 @@
 <script type="text/javascript">
     $('#btnCsvDownload').click(function() {
 
-        data = "";
+        var data = "";
+        var urls = "";
 
         var li01 = document.getElementsByClassName('resultSite');
 
@@ -37,8 +38,11 @@
         }
 
         for (var i = 0; i < li01.length; i++) {
+            var title = li01[i].getElementsByClassName('resultTitle');
+            data = data + "サイト名,"  + title[0].textContent + "\n";
             var atag = li01[i].getElementsByClassName('resultAtag');
-            data = data + "サイト名,"  + atag[0].textContent + "\n";
+            data = data + "URL,"  + atag[0].textContent + "\n";
+            urls = urls + "URL,"  + atag[0].textContent + "\n";
 
             var li02 = li01[i].getElementsByClassName('resultHeading');
             for (var j = 0; j < li02.length; j++) {
@@ -51,6 +55,8 @@
                 data = data + htag[0].textContent + "," + midashi[0].textContent + "\n";
             }
         }
+
+        data = data + "\nURL一覧\n" + urls;
 
         saveCsvFile(data);
     });

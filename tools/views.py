@@ -43,6 +43,12 @@ class RealTimeCntView(TemplateView):
 class YahooKeywordView(TemplateView):
     template_name = "yahookeyword.html"
 
+class LinkOpenerView(TemplateView):
+    template_name = "linkopener.html"
+
+class AllInTitleView(TemplateView):
+    template_name = "allintitle.html"
+
 class FrequentWordView(TemplateView):
     template_name = "frequent.html"
 
@@ -191,8 +197,8 @@ class ChrCountView(TemplateView):
 
                     print(moji_cnt)
 
-                    if moji_cnt > 10000:
-                        cnt_sum += 10000
+                    if moji_cnt > 8000:
+                        cnt_sum += 8000
                     elif moji_cnt < 1000:
                         cnt_sum += 1000
                     else:
@@ -200,7 +206,7 @@ class ChrCountView(TemplateView):
                     
                     cnt_num += 1
 
-                data = f'<p class="display-4">このキーワードで記事を書いた場合の推奨文字数は<span class="bg-info">{str(cnt_sum//cnt_num+300)}</span>文字です。</p>'
+                data = f'<p class="display-4">このキーワードで記事を書いた場合の推奨文字数は<span class="bg-info">{str(cnt_sum//cnt_num+50)}</span>文字です。</p>'
 
                 for dc in result:
                     data = data + '<div class="bg-warning p-1 my-2"><a href="' + dc['link']+ '" target=”_blank”>' + dc['title'] + '</a></div>'               
@@ -247,7 +253,7 @@ class ChrCountView(TemplateView):
                     
                     text = ''.join(line for line in lines if line)
                     
-                    dc['count'] = len(text)
+                    dc['count'] = len(text)*0.6
 
                     ret.append(dc)
 
@@ -258,7 +264,6 @@ class ChrCountView(TemplateView):
 
                    
         return ret
-
 
 class HeadingView(TemplateView):
     template_name = "suggest.html"
@@ -276,7 +281,8 @@ class HeadingView(TemplateView):
 
                 for dc in result:
                     data = data + '<div class="resultSite">'
-                    data = data + '<div class="bg-warning p-1 my-2"><a class="resultAtag" href="{}" target=”_blank”>{}</a></div>'.format(dc['link'],dc['title']) 
+                    data = data + '<div class="bg-warning px-2 m-1"><p><span class="resultTitle">{}</span><br>'.format(dc['title']) 
+                    data = data + 'URL:<a class="resultAtag mx-1 result_url" href="{}" target=”_blank”>{}</a></p></div>'.format(dc['link'],dc['link']) 
                     
                     for d in dc['heading']:
                         if d.find('h1') == 0:
@@ -327,7 +333,10 @@ class HeadingView(TemplateView):
                     heading_list = []
                     
                     for tag in tags:
-                        heading_list.append(tag.name + ':' + tag.text.strip())
+                        tagname = tag.text.strip()
+                        tagname = tagname.replace(' ', '')
+                        tagname = tagname.replace( '\n' , '' )
+                        heading_list.append(tag.name + ':' + tagname)
                             
                     dc['heading'] = heading_list
                     ret.append(dc)
@@ -357,8 +366,11 @@ class SuggestView(TemplateView):
                 for res1 in result:
                     data = data + '<p class="bg-info">' + res1[0] + '</p>'
                     for res2 in res1[1]:
-                        data = data + '<li>' + res2  + '</li>'
-
+                        #link = f'https://www.google.co.jp/search?q=allintitle%3A{res2}&hl=ja&pws=0&complete=0'
+                        #https://www.google.com/search?ie=utf-8&oe=utf-8&hl=ja&lr=lang_ja&q=allintitle%3AGrapecity
+                        #data = data + f'<li>{res2}<a class="mx-1" href="{link}" target​="_blank">allintitle</a></li>'
+                        data = data + f'<li>{res2}</li>'
+ 
                 return HttpResponse(data)
 
             elif rq.method == 'POST':  # POSTの処理（使用してない処理）
@@ -398,7 +410,7 @@ class SuggestView(TemplateView):
 
 def getGooleList(self,keyword):
 
-    url = 'https://www.google.com/search?q={}&hl=ja&sourceid=chrome&ie=UTF-8&num=5'
+    url = 'https://www.google.com/search?q={}&hl=ja&sourceid=chrome&ie=UTF-8&num=15'
 
     print(keyword)
 

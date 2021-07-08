@@ -64,3 +64,8 @@
     background: linear-gradient(transparent 50%, #c1e0ff 70%);
     font-weight: bold; 
 }
+
+/* aタグ */
+.result_url {
+    word-wrap:break-word;
+}

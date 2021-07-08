@@ -12,4 +12,6 @@ urlpatterns = [
     path('replace/',views.ReplaceView.as_view(),name='replace'),
     path('frequent/',views.FrequentWordView.as_view(),name='frequent'),
     path('animbutton/',views.AnimButton.as_view(),name='animbutton'),
+    path('linkopener/',views.LinkOpenerView.as_view(),name='linkopener'),
+    path('allintitle/',views.AllInTitleView.as_view(),name='allintitle'),
 ]

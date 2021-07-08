@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}
+複数リンクオープナー
+{% endblock %}
+{% block content %}
+<div class="col-sm-12 col-lg-9">
+
+    <h2 class="mb-3">複数リンクオープナー</h2>
+
+    <textarea id="txtLinks" style="width:100%" rows="12" placeholder="カウントする文字を入力してください" class="mb-2"></textarea>
+    <div><button id="btnOpen" class="mb-3 btn btn-primary">一括オープン</button></div>
+
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+
+        $(function() {
+            $('#txtLinks').keyup(function() {
+                if (event.keyCode === 13 && event.ctrlKey) {
+                    event.preventDefault();
+                    document.getElementById("btnOpen").click();
+                }
+            });
+
+            $('#btnOpen').click(function() {
+                var urls = $('#txtLinks').val();
+                if(urls.trim().length > 0){
+                    openUrls(urls.trim());
+                }else{
+                    alert("URLを入力してください");
+                    return false;
+                }
+            })
+        });
+
+        function openUrls(urls) {
+            var prefix = 'http://';
+            var prefix2 = 'https://';
+            arrUrls = urls.replace(/\s+/g, ",").split(",");
+            //remove empty && duplicate
+            arrUrls = arrUrls.filter(Boolean);
+            arrUrls = arrUrls.filter(function(element, indexOfElement) {
+                return indexOfElement === arrUrls.indexOf(element)
+            });
+            arrUrls.forEach(function(url){
+                url = changesize(url);
+                if (url.indexOf(prefix) === -1 && url.indexOf(prefix2) === -1)
+                {
+                    url = prefix + url;
+                }
+                    let link     = document.createElement('a');
+                    link.href    = url;
+                    link.target  = "_blank";
+                    link.rel = "noopener noreferrer nofollow";
+                    link.click();
+            });
+        }
+
+        function changesize(chars) {
+            chars = chars.replace(/。/g, '.');
+            chars = chars.replace(/・/g, '.');
+            var ascii = '';
+            for(var i=0; i<chars.length; i++) {
+                var j = chars[i].charCodeAt(0);
+                if (j >= 0xFF00 && j <= 0xFFEF) {
+                j = 0xFF & (j + 0x20);
+                }
+                ascii += String.fromCharCode(j);
+            }
+            return ascii;
+        }
+
+        function clearText(id) {
+            $('#'+id).val(null).focus();
+        }
+
+
+</script>
+{% endblock %}
+

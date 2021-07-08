@@ -44,13 +44,6 @@
         <div class="col-sm-12 col-lg-4">
             <div class="DivLink mb-3">
                 <div class="p-2">
-                    <p><span class = "top-title">■関連キーワードチェッカー</span></p>
-                    <p>指定したキーワードの関連キーワードを一覧表示します。</p>
-                    <a class ="Link" href="{% url 'suggest' %}"></a>
-                </div>
-            </div>
-            <div class="DivLink mb-3">
-                <div class="p-2">
                     <p><span class = "top-title">■文字列の置き換え</span></p>
                     <p>任意の文字列を一括、あるいは１つずつ確認しながら置き換えます。</p>
                     <a class ="Link" href="{% url 'replace' %}"></a>
@@ -65,8 +58,22 @@
             </div>
             <div class="DivLink mb-3">
                 <div class="p-2">
+                    <p><span class = "top-title">■allititleリンクメーカー</span></p>
+                    <p>複数キーワードのallititleリンクを一括で作成します。</p>
+                    <a class ="Link" href="{% url 'allintitle' %}"></a>
+                </div>
+            </div>
+            <div class="DivLink mb-3">
+                <div class="p-2">
                     <p><span class = "top-title">■虫眼鏡キーワード＋広告</span></p>
                     <p>指定したキーワードに対するヤフーの虫眼鏡キーワードと広告を表示します。</p>
+                    <a class ="Link" href="{% url 'suggest' %}"></a>
+                </div>
+            </div>
+            <div class="DivLink mb-3">
+                <div class="p-2">
+                    <p><span class = "top-title">■関連キーワードチェッカー</span></p>
+                    <p>指定したキーワードの関連キーワードを一覧表示します。</p>
                     <a class ="Link" href="{% url 'suggest' %}"></a>
                 </div>
             </div>
