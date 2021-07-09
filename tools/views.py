@@ -28,6 +28,12 @@ import base64
 
 # Create your views here.
 
+class AdvItem:
+    def __init__(self, title,summary,cite):
+        self.title = title
+        self.summary = summary
+        self.cite = cite
+
 class IndexView(TemplateView):
     template_name = 'index.html'
 
@@ -42,6 +48,73 @@ class RealTimeCntView(TemplateView):
 
 class YahooKeywordView(TemplateView):
     template_name = "yahookeyword.html"
+
+    def get(self, rq):
+
+        if rq.is_ajax():        
+            if rq.method == 'GET':  # GETの処理
+                param1 = rq.GET.get("param1")  # GETパラメータ1
+                keyword = param1
+
+                results = YahooKeywordView.getkeylist(self,keyword)
+
+                data = ''
+
+                data = data + '<h3>虫眼鏡キーワード</h3>'
+                if len(results[0]) > 0:
+                    for res1 in results[0]:
+                        data = data + f'<li>{res1}</li>'
+                else:
+                    data = data + '<p>キーワードはありません。</p>'
+
+                data = data + '<h3>広告</h3>'
+
+                if len(results[1]) > 0:
+                    for res2 in results[1]:
+                        data = data + f'<li>{res2.title}</li>'
+                else:
+                    data = data + '<p>広告はありません。</p>'
+
+                return HttpResponse(data)
+
+        return render(rq, 'yahookeyword.html')
+
+    def getkeylist(self,keyword):
+
+        keyword_quote = urllib.parse.quote(keyword)
+    
+        url = 'https://search.yahoo.co.jp/search?p={}'.format(keyword_quote)
+        
+        data = None
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36"}
+        request = urllib.request.Request(url, data, headers)
+        response = urllib.request.urlopen(request)
+        html = response.read()
+        #time.sleep(1)
+        
+        #print(html)
+        
+        soup1 = BeautifulSoup(html,'html.parser')
+        items = soup1.find_all(class_="Unit__list")
+        adv_items = soup1.find_all(class_="sw-Card Ad js-Ad")
+        
+        keywordlist = []
+        adv_list = []
+
+        if len(items) >= 2:
+        
+            #print(items[1])
+            item_lists = items[1].select('a') #下段の虫眼鏡キーワードから取得するため[1]を指定
+        
+        
+            for item in item_lists:
+                 keywordlist.append(item.text)
+
+        for adv_item in adv_items:
+            print(adv_item.select('h3.sw-Card__titleMain')[0].text)
+            adv_list.append(AdvItem(adv_item.select('h3.sw-Card__titleMain')[0].text,adv_item.select('p.sw-Card__summary')[0].text,adv_item.select('cite')[0].text))
+
+        return keywordlist,adv_list
 
 class LinkOpenerView(TemplateView):
     template_name = "linkopener.html"

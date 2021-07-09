@@ -14,4 +14,5 @@ urlpatterns = [
     path('animbutton/',views.AnimButton.as_view(),name='animbutton'),
     path('linkopener/',views.LinkOpenerView.as_view(),name='linkopener'),
     path('allintitle/',views.AllInTitleView.as_view(),name='allintitle'),
+    path('yahookeyword/',views.YahooKeywordView.as_view(),name='yahookeyword'),
 ]
