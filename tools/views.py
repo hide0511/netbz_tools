@@ -70,7 +70,6 @@ class KouseiView(TemplateView):
                     for res1 in result:
                         data = data + f'<tr><td>{res1["index"]}</td><td>{res1["surface"]}</td><td>{res1["shitekiinfo"]}</td><td>{res1["shitekiword"]}</td></tr>'
                     data = data + '</tbody></table>'
-                    data = data + "<h2>～指摘分類一覧～</h2><ul><li>誤変換　　　　　　　　　例：人事異同→人事異動</li><li>誤用　　　　　　　　　　例：煙に巻く→けむに巻く</li><li>使用注意　　　　　　　　例：外人墓地→外国人墓地</li><li>不快語　　　　　　　　　例：がんをつける→にらむ</li><li>機種依存または拡張文字　例：○付き数字、一部の旧字体など</li><li>外国地名　　　　　　　　例：モルジブ→モルディブ</li><li>固有名詞　　　　　　　　例：ヤフーブログ→Yahoo!ブログ</li><li>人名　　　　　　　　　　例：ベートーヴェン→ベートーベン</li><li>ら抜き　　　　　　　　　例：食べれる→食べられる</li><li>当て字　　　　　　　　　例：出鱈目、振り仮名</li><li>表外漢字あり　　　　　　例：灯籠→灯●</li><li>用字　　　　　　　　　　例：曖昧→あいまい</li><li>用語言い換え（商標など）例：セロテープ→セロハンテープ</li><li>二重否定　　　　　　　　例：聞かなくはない</li><li>助詞不足の可能性あり　　例：学校行く</li><li>冗長表現　　　　　　　　例：ことができます</li><li>略語　　　　　　　　　　例：ADSL→非対称デジタル加入者線(ADSL)</li></ul>"
                     data = data + "<h2>校正箇所</h2>"
                     adjust_pos = 0
                     for res1 in result:
