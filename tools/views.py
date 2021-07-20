@@ -46,6 +46,98 @@ class ReplaceView(TemplateView):
 class RealTimeCntView(TemplateView):
     template_name = "realtimecnt.html"
 
+class KouseiView(TemplateView):
+    template_name = "kousei.html"
+
+    def get(self, rq):
+
+        if rq.is_ajax():        
+            if rq.method == 'GET':  # GETの処理
+                param1 = rq.GET.get("param1")  # GETパラメータ1
+                text = param1
+
+                text = text.replace('\n', '<br>')
+                #text = text.replace('\r\n', '<br>')
+
+                result = KouseiView.getKousei(self,text)
+
+                _text = text
+
+                data = ''
+
+                if len(result) > 0:
+                    data = '<table class="table table-striped"><thead><tr><th>番号</th><th>対象表記</th><th>詳細情報</th><th>言い換え候補文字列</th></tr></thead><tbody>'
+                    for res1 in result:
+                        data = data + f'<tr><td>{res1["index"]}</td><td>{res1["surface"]}</td><td>{res1["shitekiinfo"]}</td><td>{res1["shitekiword"]}</td></tr>'
+                    data = data + '</tbody></table>'
+                    data = data + "<h2>～指摘分類一覧～</h2><ul><li>誤変換　　　　　　　　　例：人事異同→人事異動</li><li>誤用　　　　　　　　　　例：煙に巻く→けむに巻く</li><li>使用注意　　　　　　　　例：外人墓地→外国人墓地</li><li>不快語　　　　　　　　　例：がんをつける→にらむ</li><li>機種依存または拡張文字　例：○付き数字、一部の旧字体など</li><li>外国地名　　　　　　　　例：モルジブ→モルディブ</li><li>固有名詞　　　　　　　　例：ヤフーブログ→Yahoo!ブログ</li><li>人名　　　　　　　　　　例：ベートーヴェン→ベートーベン</li><li>ら抜き　　　　　　　　　例：食べれる→食べられる</li><li>当て字　　　　　　　　　例：出鱈目、振り仮名</li><li>表外漢字あり　　　　　　例：灯籠→灯●</li><li>用字　　　　　　　　　　例：曖昧→あいまい</li><li>用語言い換え（商標など）例：セロテープ→セロハンテープ</li><li>二重否定　　　　　　　　例：聞かなくはない</li><li>助詞不足の可能性あり　　例：学校行く</li><li>冗長表現　　　　　　　　例：ことができます</li><li>略語　　　　　　　　　　例：ADSL→非対称デジタル加入者線(ADSL)</li></ul>"
+                    data = data + "<h2>校正箇所</h2>"
+                    adjust_pos = 0
+                    for res1 in result:
+                        insdata1 = '<span style="color:#ff0000; font-size:125%; font-weight:bold;">'
+                        _text = _text[:int(res1['startpos'])+adjust_pos] + insdata1 + _text[int(res1['startpos'])+adjust_pos:]
+                        adjust_pos = adjust_pos + len(insdata1)    
+
+                        insdata2 = '</span>'
+                        _text = _text[:int(res1['startpos'])+int(res1['length'])+adjust_pos] + insdata2 + _text[int(res1['startpos'])+int(res1['length'])+adjust_pos:]
+                        adjust_pos = adjust_pos + len(insdata2)    
+
+                        #_text = _text.replace('\n', '<br>')
+                        #_text = _text.replace('\r\n', '<br>')
+
+                    data = data + _text
+                    
+                else:
+                    data = data + '<p>校正候補はありません。</p>'
+
+                return HttpResponse(data)
+
+        return render(rq, 'kousei.html')
+
+    def getKousei(self,text):
+
+        text = urllib.parse.quote(text)
+    
+        url = 'https://jlp.yahooapis.jp/KouseiService/V1/kousei'
+
+        data = "sentence=" + text
+
+        appid = 'dj00aiZpPTltQWZwREpBVEdyZiZzPWNvbnN1bWVyc2VjcmV0Jng9ZDg-'
+
+        headers = {'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'Yahoo AppID: {0}'.format(appid),
+                'Host': 'jlp.yahooapis.jp',
+                'Content-Length': str(len(data)),
+                }
+        
+        request = urllib.request.Request(url, data=data.encode('utf-8'),headers=headers)
+        response = urllib.request.urlopen(request)
+
+        kousei_text = response.read()
+
+        print(kousei_text)
+
+        xml_soup = BeautifulSoup(kousei_text, 'lxml')
+        
+        ret_list = []
+        index = 1
+
+        for result in xml_soup.find_all("result"):
+            dc = {}
+
+            dc['index'] = index
+            dc['startpos'] = result.find('startpos').getText()
+            dc['length'] = result.find("length").getText()
+            dc['surface'] = result.find("surface").getText()
+            dc['shitekiinfo'] = result.find("shitekiinfo").getText()
+            dc['shitekiword'] = result.find("shitekiword").getText()
+
+            ret_list.append(dc)
+
+            index =  index + 1
+
+        return ret_list
+
 class YahooKeywordView(TemplateView):
     template_name = "yahookeyword.html"
 
@@ -93,10 +185,19 @@ class YahooKeywordView(TemplateView):
         #time.sleep(1)
         
         #print(html)
-        
+
+        #html = requests.get(url)
+
         soup1 = BeautifulSoup(html,'html.parser')
+
+        
+        #with open('file.txt', 'w') as f:
+        #    print(soup1.get_text(), file=f)
+        
+
         items = soup1.find_all(class_="Unit__list")
         adv_items = soup1.find_all(class_="sw-Card Ad js-Ad")
+        #adv_items = soup1.find_all(class_="sw-CardBase")
         
         keywordlist = []
         adv_list = []
@@ -105,14 +206,20 @@ class YahooKeywordView(TemplateView):
         
             #print(items[1])
             item_lists = items[1].select('a') #下段の虫眼鏡キーワードから取得するため[1]を指定
-        
-        
+                
             for item in item_lists:
                  keywordlist.append(item.text)
 
+        print(len(adv_items))
+
         for adv_item in adv_items:
             print(adv_item.select('h3.sw-Card__titleMain')[0].text)
-            adv_list.append(AdvItem(adv_item.select('h3.sw-Card__titleMain')[0].text,adv_item.select('p.sw-Card__summary')[0].text,adv_item.select('cite')[0].text))
+            a_title = adv_item.select('h3.sw-Card__titleMain')
+            a_summary = adv_item.select('p.sw-Card__summary')
+            a_cite = adv_item.select('cite')
+
+            if len(a_title) > 0 and len(a_summary) > 0 and len(a_cite) > 0:
+                adv_list.append(AdvItem(adv_item.select('h3.sw-Card__titleMain')[0].text,adv_item.select('p.sw-Card__summary')[0].text,adv_item.select('cite')[0].text))
 
         return keywordlist,adv_list
 

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}
+文章校正
+{% endblock %}
+{% block content %}
+<div class="col-sm-12 col-lg-9">
+
+    <h2 class="mb-3">文章校正</h2>
+  
+    <label for="keyword">キーワード</label>
+
+    <textarea id="input_data" style="width:100%" rows="5" placeholder="対象のテキストを入力してください" class="mb-2"></textarea>
+
+    <button id="button1" class="m-3 btn btn-primary" type="button">調査する</button>
+    <div id="resultGET"></div>
+
+</div>
+{% endblock %}
+
+{% block url %}url: "{% url 'kousei' %}",{% endblock %}
