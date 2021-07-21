@@ -26,6 +26,8 @@ import japanize_matplotlib
 import io
 import base64
 
+from django.http import JsonResponse
+
 # Create your views here.
 
 class AdvItem:
@@ -45,6 +47,102 @@ class ReplaceView(TemplateView):
 
 class RealTimeCntView(TemplateView):
     template_name = "realtimecnt.html"
+
+class KouseiFView(TemplateView):
+    template_name = "kousei-f.html"
+
+    def post(self, rq):
+
+        if rq.is_ajax():        
+            if rq.method == 'POST':  # POSTの処理
+                text = rq.POST.get('input_data')  # POSTで渡された値
+                text = text.replace('\n', '<br>')
+                #text = text.replace('\r\n', '<br>')
+
+                result = KouseiFView.getKousei(self,text)
+
+                _text = text
+
+                data = '<h2>調査結果</h2>'
+
+                if len(result) > 0:
+                    data = data + '<table class="table table-striped"><thead><tr><th>番号</th><th>対象表記</th><th>詳細情報</th><th>言い換え候補文字列</th></tr></thead><tbody>'
+                    for res1 in result:
+                        data = data + f'<tr><td>{res1["index"]}</td><td>{res1["surface"]}</td><td>{res1["shitekiinfo"]}</td><td>{res1["shitekiword"]}</td></tr>'
+                    data = data + '</tbody></table>'
+                    data = data + "<h2>校正箇所</h2>"
+                    adjust_pos = 0
+                    for res1 in result:
+                        insdata1 = '<span style="color:#ff0000; font-size:125%; font-weight:bold;">'
+                        _text = _text[:int(res1['startpos'])+adjust_pos] + insdata1 + _text[int(res1['startpos'])+adjust_pos:]
+                        adjust_pos = adjust_pos + len(insdata1)    
+
+                        insdata2 = '</span>'
+                        _text = _text[:int(res1['startpos'])+int(res1['length'])+adjust_pos] + insdata2 + _text[int(res1['startpos'])+int(res1['length'])+adjust_pos:]
+                        adjust_pos = adjust_pos + len(insdata2)    
+
+                        #_text = _text.replace('\n', '<br>')
+                        #_text = _text.replace('\r\n', '<br>')
+
+                    data = data + _text
+                    
+                else:
+                    data = data + '<p>校正候補はありません。</p>'
+
+            d = {
+                'input_data':data
+            }
+            return JsonResponse(d)
+
+        return render(rq, 'kousei-f.html')
+
+    def getKousei(self,text):
+
+        text = urllib.parse.quote(text)
+    
+        print(text)
+
+        url = 'https://jlp.yahooapis.jp/KouseiService/V1/kousei'
+
+        data = "sentence=" + text
+
+        appid = 'dj00aiZpPTltQWZwREpBVEdyZiZzPWNvbnN1bWVyc2VjcmV0Jng9ZDg-'
+
+        headers = {'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'Yahoo AppID: {0}'.format(appid),
+                'Host': 'jlp.yahooapis.jp',
+                'Content-Length': str(len(data)),
+                }
+        
+        request = urllib.request.Request(url, data=data.encode('utf-8'),headers=headers)
+        response = urllib.request.urlopen(request)
+
+        kousei_text = response.read()
+
+        print(kousei_text)
+
+        xml_soup = BeautifulSoup(kousei_text, 'lxml')
+        
+        ret_list = []
+        index = 1
+
+        for result in xml_soup.find_all("result"):
+            dc = {}
+
+            dc['index'] = index
+            dc['startpos'] = result.find('startpos').getText()
+            dc['length'] = result.find("length").getText()
+            dc['surface'] = result.find("surface").getText()
+            dc['shitekiinfo'] = result.find("shitekiinfo").getText()
+            dc['shitekiword'] = result.find("shitekiword").getText()
+
+            ret_list.append(dc)
+
+            index =  index + 1
+
+        return ret_list
+
+
 
 class KouseiView(TemplateView):
     template_name = "kousei.html"
@@ -88,7 +186,7 @@ class KouseiView(TemplateView):
                     
                 else:
                     data = data + '<p>校正候補はありません。</p>'
-
+                
                 return HttpResponse(data)
 
         return render(rq, 'kousei.html')

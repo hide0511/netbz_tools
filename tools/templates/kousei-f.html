@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}
+文章校正
+{% endblock %}
+{% block content %}
+<div class="col-sm-12 col-lg-9">
+
+    <h2 class="mb-3">文章校正</h2>
+    <form id="kousepost_fm"  method="post">
+        {% csrf_token %}
+        <textarea id="input_data" style="width:100%" rows="5" placeholder="対象の文章を入力してください" class="mb-2"></textarea>
+        <button id="button2" class="m-3 btn btn-primary" type="button">調査する</button>
+    </form>
+    <div id="resultGET"></div>
+    <div class="m-3" ><h2>指摘分類一覧</h2><ul><li>誤変換　　　　　　　　　例：人事異同→人事異動</li><li>誤用　　　　　　　　　　例：煙に巻く→けむに巻く</li><li>使用注意　　　　　　　　例：外人墓地→外国人墓地</li><li>不快語　　　　　　　　　例：がんをつける→にらむ</li><li>機種依存または拡張文字　例：○付き数字、一部の旧字体など</li><li>外国地名　　　　　　　　例：モルジブ→モルディブ</li><li>固有名詞　　　　　　　　例：ヤフーブログ→Yahoo!ブログ</li><li>人名　　　　　　　　　　例：ベートーヴェン→ベートーベン</li><li>ら抜き　　　　　　　　　例：食べれる→食べられる</li><li>当て字　　　　　　　　　例：出鱈目、振り仮名</li><li>表外漢字あり　　　　　　例：灯籠→灯●</li><li>用字　　　　　　　　　　例：曖昧→あいまい</li><li>用語言い換え（商標など）例：セロテープ→セロハンテープ</li><li>二重否定　　　　　　　　例：聞かなくはない</li><li>助詞不足の可能性あり　　例：学校行く</li><li>冗長表現　　　　　　　　例：ことができます</li><li>略語　　　　　　　　　　例：ADSL→非対称デジタル加入者線(ADSL)</li></ul></div>
+
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+// csrf_tokenの取得に使う
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+$.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+$('#button2').on('click', function(){
+event.preventDefault();
+dispLoading("処理中...この処理には数分かかることがあります");
+
+    // Ajax通信を開始
+    $.ajax({
+        url: "/kousei-f/",
+        method: "POST",
+        dataType: "json",
+        data:{'input_data':$('#input_data').val()},
+        timeout: 180000,
+    })
+    .done(function(data) {
+        // 通信成功時の処理を記述
+        $('#resultGET').html(data.input_data);
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        // 通信失敗時の処理を記述
+        $('#resultGET').text('処理が失敗しました。時間をおいて再度お試しください。');
+        console.log("ajax通信に失敗しました");
+        console.log("jqXHR          : " + jqXHR.status); 
+        console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
+        console.log("errorThrown    : " + errorThrown.message); // 例外情報
+        console.log("URL            : " + url);
+    })
+    .always( function(data) {
+        // Loading 画像を消す
+        removeLoading();
+    });
+});
+
+
+/* ------------------------------
+表示用の関数
+------------------------------ */
+function dispLoading(msg){
+// 引数なしの場合、メッセージは非表示。
+if(msg === undefined ) msg = "";
+
+// 画面表示メッセージを埋め込み
+var innerMsg = "<div id='innerMsg'>" + msg + "</div>";  
+
+// ローディング画像が非表示かどうかチェックし、非表示の場合のみ出力。
+if($("#nowLoading").length == 0){
+    $("body").append("<div id='nowLoading'>" + innerMsg + "</div>");
+}
+}
+
+/* ------------------------------
+表示ストップ用の関数
+------------------------------ */
+function removeLoading(){
+$("#nowLoading").remove();
+}
+
+</script>
+{% endblock %}
+
+{% block url %}url: "{% url 'kousei-f' %}",{% endblock %}
