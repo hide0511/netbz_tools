@@ -17,4 +17,5 @@ urlpatterns = [
     path('yahookeyword/',views.YahooKeywordView.as_view(),name='yahookeyword'),
     path('kousei/',views.KouseiView.as_view(),name='kousei'),
     path('kousei-f/',views.KouseiFView.as_view(),name='kousei-f'),
+    path('wordcloud/',views.WordCloudView.as_view(),name='wordcloud'),
 ]

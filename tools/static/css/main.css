@@ -69,3 +69,7 @@
 .result_url {
     word-wrap:break-word;
 }
+
+img {
+    max-width: 100%;  /* 横幅に合わせて自動縮小するが、拡大はしない */
+ }

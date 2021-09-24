@@ -16,6 +16,7 @@ import collections
 import seaborn as sns
 
 import matplotlib
+from wordcloud import WordCloud
 
 #バックエンドを指定
 matplotlib.use('Agg')
@@ -47,6 +48,101 @@ class ReplaceView(TemplateView):
 
 class RealTimeCntView(TemplateView):
     template_name = "realtimecnt.html"
+
+class WordCloudView(TemplateView):
+    template_name = "wordcloud.html"
+
+    def post(self, rq):
+
+        if rq.is_ajax():        
+            if rq.method == 'POST':  # POSTの処理
+                text = rq.POST.get('input_data')  # POSTで渡された値
+                text = text.replace('\n', '<br>')
+                #text = text.replace('\r\n', '<br>')
+
+                result = WordCloudView.getWordCloud(self,text)
+
+
+                data = '<h2>調査結果</h2>'
+
+                if len(result) > 0:
+                    word_list = []
+                    for res1 in result:
+                        word_list.append(res1["surface"])
+
+                    word_chain = ' '.join(word_list)
+
+                    spwd=["br","もの","これ","ため","それ","ところ","よう","こと","そう","ます","ので","から","など","です","する","いる","ない","あり","なく","また"]
+
+                    #W = WordCloud(width=840, height=680, background_color='white', colormap='bone', font_path='C:\Windows\Fonts\yumin.ttf').generate(word_chain)
+                    W = WordCloud(width=1000, height=680, background_color='white', max_words=300, stopwords=spwd, colormap='viridis', font_path='.fonts/ipaexg.ttf').generate(word_chain)
+
+                    #plt.figure(figsize=(10,4))
+                    plt.rcParams["figure.figsize"] = (8, 6)
+                    plt.imshow(W)
+                    plt.axis('off')
+                    #plt.show()
+
+                    #fig = plt.subplots(figsize=(8, 20))
+                    #fig = plt.figure(facecolor="skyblue", linewidth=300, edgecolor="green")
+                    #plt.title('WordCloud')
+                    #plt.subplots_adjust(top=0.98,bottom = 0.03,left = 0.2,right = 0.9,hspace = 0.1)
+
+                    buffer = io.BytesIO()
+                    plt.savefig(buffer, format='png')
+                    image_png = buffer.getvalue()
+                    graph = base64.b64encode(image_png)
+                    graph = graph.decode('utf-8')
+                    buffer.close()
+                    data = '<h2>WordCloud</h2>'
+                    data = data + f'<img src="data:image/png;base64, {graph} " alt="">'
+
+                else:
+                    data = data + '<p>取得できる単語がありませんでした。</p>'
+
+            d = {
+                'input_data':data
+            }
+            return JsonResponse(d)
+
+        return render(rq, 'wordcloud.html')
+
+    def getWordCloud(self,text):
+        text = urllib.parse.quote(text)
+        url = 'https://jlp.yahooapis.jp/MAService/V1/parse'
+        data = "sentence=" + text
+        appid = 'dj00aiZpPTltQWZwREpBVEdyZiZzPWNvbnN1bWVyc2VjcmV0Jng9ZDg-'
+        headers = {'Content-Type': 'application/x-www-form-urlencoded',
+                        'User-Agent': 'Yahoo AppID: {0}'.format(appid),
+                        'Host': 'jlp.yahooapis.jp',
+                        'Content-Length': str(len(data)),
+                        }
+                
+        request = urllib.request.Request(url, data=data.encode('utf-8'),headers=headers)
+        response = urllib.request.urlopen(request)
+
+        kousei_text = response.read()
+
+        print(kousei_text)
+
+        xml_soup = BeautifulSoup(kousei_text, 'lxml')
+
+        ret_list = []
+        dc = {}
+        index = 0
+
+        for result in xml_soup.find_all("word"):
+            dc = {}
+
+            dc['surface'] = result.find('surface').getText()
+            dc['pos'] = result.find('pos').getText()
+
+            if dc['pos'] == '名詞' and dc['surface'].strip() != 'br':
+                ret_list.append(dc)
+
+            index =  index + 1
+
+        return ret_list
 
 class KouseiFView(TemplateView):
     template_name = "kousei-f.html"
@@ -141,8 +237,6 @@ class KouseiFView(TemplateView):
             index =  index + 1
 
         return ret_list
-
-
 
 class KouseiView(TemplateView):
     template_name = "kousei.html"
