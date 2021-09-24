@@ -67,12 +67,20 @@ class WordCloudView(TemplateView):
 
                 if len(result) > 0:
                     word_list = []
+                    cnt = 0
+                    _stopword = ""
                     for res1 in result:
-                        word_list.append(res1["surface"])
+                        if cnt != 0:
+                            word_list.append(res1["surface"])
+                        else:
+                            _stopword = res1["surface"]
+                        cnt = cnt + 1
 
                     word_chain = ' '.join(word_list)
 
                     spwd=["br","もの","これ","ため","それ","ところ","よう","こと","そう","ます","ので","から","など","です","する","いる","ない","あり","なく","また"]
+
+                    spwd.append(_stopword)
 
                     #W = WordCloud(width=840, height=680, background_color='white', colormap='bone', font_path='C:\Windows\Fonts\yumin.ttf').generate(word_chain)
                     W = WordCloud(width=1000, height=680, background_color='white', max_words=300, stopwords=spwd, colormap='viridis', font_path='.fonts/ipaexg.ttf').generate(word_chain)
@@ -123,7 +131,7 @@ class WordCloudView(TemplateView):
 
         kousei_text = response.read()
 
-        print(kousei_text)
+        #print(kousei_text)
 
         xml_soup = BeautifulSoup(kousei_text, 'lxml')
 
@@ -137,7 +145,9 @@ class WordCloudView(TemplateView):
             dc['surface'] = result.find('surface').getText()
             dc['pos'] = result.find('pos').getText()
 
-            if dc['pos'] == '名詞' and dc['surface'].strip() != 'br':
+            hinshi = ('名詞','動詞','形容詞')
+
+            if dc['pos'] in hinshi and dc['surface'].strip() != 'br':
                 ret_list.append(dc)
 
             index =  index + 1
