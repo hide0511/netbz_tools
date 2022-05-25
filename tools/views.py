@@ -67,20 +67,23 @@ class WordCloudView(TemplateView):
 
                 if len(result) > 0:
                     word_list = []
-                    cnt = 0
+                    #cnt = 0
                     _stopword = ""
                     for res1 in result:
+                        '''
                         if cnt != 0:
                             word_list.append(res1["surface"])
                         else:
                             _stopword = res1["surface"]
                         cnt = cnt + 1
-
+                        '''
+                        word_list.append(res1["surface"])
+                        
                     word_chain = ' '.join(word_list)
 
                     spwd=["br","もの","これ","ため","それ","ところ","よう","こと","そう","ます","ので","から","など","です","する","いる","ない","あり","なく","また"]
 
-                    spwd.append(_stopword)
+                    #spwd.append(_stopword)
 
                     #W = WordCloud(width=840, height=680, background_color='white', colormap='bone', font_path='C:\Windows\Fonts\yumin.ttf').generate(word_chain)
                     W = WordCloud(width=1000, height=680, background_color='white', max_words=300, stopwords=spwd, colormap='viridis', font_path='.fonts/ipaexg.ttf').generate(word_chain)
@@ -116,6 +119,7 @@ class WordCloudView(TemplateView):
         return render(rq, 'wordcloud.html')
 
     def getWordCloud(self,text):
+        '''
         text = urllib.parse.quote(text)
         url = 'https://jlp.yahooapis.jp/MAService/V1/parse'
         data = "sentence=" + text
@@ -151,7 +155,26 @@ class WordCloudView(TemplateView):
                 ret_list.append(dc)
 
             index =  index + 1
-
+        '''
+        ret_list = []
+        delete_list = ['し','こと','する','いる','ある','もの','なり','ため','さ','い','あり','よっ','よう','つい','いう','でき','なる','なっ']
+        
+        m = MeCab.Tagger ()
+        node = m.parseToNode(text)
+        while node:
+            dc = {}
+            try:
+                hinshi = node.feature.split(",")[0]
+                if hinshi in ["名詞","動詞","形容詞"]:
+                    if node.surface not in delete_list:
+                        if str(node.surface).isdigit() == False:
+                            dc['surface'] = node.surface
+                            dc['pos'] = hinshi
+                            ret_list.append(dc)
+            except:
+                continue
+            finally:
+                node = node.next            
         return ret_list
 
 class KouseiFView(TemplateView):
