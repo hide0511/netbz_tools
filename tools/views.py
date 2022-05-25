@@ -46,6 +46,9 @@ class AnimButton(TemplateView):
 class ReplaceView(TemplateView):
     template_name = "replace.html"
 
+class HtmlMailView(TemplateView):
+    template_name = "htmlmail.html"
+
 class RealTimeCntView(TemplateView):
     template_name = "realtimecnt.html"
 
