@@ -17,6 +17,98 @@
     <div class="m-1 border rounded">
         <button id="btnReplaceAll" class="m-2 btn w-75 btn-primary" type="button">一括置換</button>
     </div>
+    <p>空行</p>
+        <textarea id="blank-line" style="width:100%" rows="1" placeholder="空行に置き換えるテキスト" class="mb-2">&lt;p&gt;&amp;nbsp;&lt;/p&gt;</textarea>
+    <p>行の前</p>
+        <textarea id="before-line" style="width:100%" rows="1" placeholder="空行に置き換えるテキスト" class="mb-2">&lt;p&gt;&lt;span style=&quot;font-size: 12pt;&quot;&gt;</textarea>
+    <p>行の後</p>
+        <textarea id="after-line" style="width:100%" rows="1" placeholder="空行に置き換えるテキスト" class="mb-2">&lt;/span&gt;&lt;/p&gt;</textarea>
+    <p>ヘッダ</p>
+        <textarea id="r-header" style="width:100%" rows="5" placeholder="空行に置き換えるテキスト" class="mb-2">
+&lt;strong&gt;╋ 副業で月収115万円講座 ╋&lt;/strong&gt;
+
+こんにちは、ヒデローです。
+
+
+このメルマガでは
+「大好きな事で効率良く稼ぐための方法」
+をお伝えしています。
+
+
+------------------
+※このメルマガが不要な場合は
+こちらから解除してください
+→　%%delpage%%
+------------------
+
+
+        </textarea>
+    <p>ヘッダ</p>
+        <textarea id="r-footer" style="width:100%" rows="5" placeholder="空行に置き換えるテキスト" class="mb-2">
+
+
+今回も最後まで読んでいただき
+ありがとうございました。
+
+
+ヒデロー
+
+
+◇---------------------------◇
+◆ このメルマガについて
+◇---------------------------◇
+
+このメルマガでは
+『大好きな事で稼ぐ方法』を
+実際に僕が稼いだときの【具体例】
+も交えながらお伝えしていきます。
+
+
+また新たに作成した【ツール】の
+プレゼントも予定しています。
+
+
+◇---------------------------◇
+◆ 迷惑メール対策
+◇---------------------------◇
+
+僕からのメルマガを確実に受け取るために
+以下の設定をしておいてください。
+
+http://46mail.net/index.php?e=hidero@fun-shift.net
+
+
+今は大丈夫でも、突然迷惑メールフォルダに
+入ってしまう場合もありますので、
+どうぞよろしくお願いします。
+
+◇---------------------------◇
+◆ 感想、質問
+◇---------------------------◇
+
+メールの感想やご質問を受け付けています。
+
+どんな事でも大歓迎なので
+ご遠慮なくご連絡ください。
+
+■お問い合わせフォーム
+https://hidero.net/toiawase/
+
+
+■□・…━━━━━━━━━━━━━
+ 
+　　事業者名：ファンシフト
+　　代表　ヒデロー（田方 秀郎）
+ 
+　　Email: hidero@fun-shift.net
+　　URL  : https://hidero.net/tokusho/
+
+■□・…━━━━━━━━━━━━━
+
+□ メルマガの配信解除はこちら
+%%delpage%%
+
+        </textarea>
 
     <div id="messageArea"></div>
 </div>
@@ -30,6 +122,9 @@
 
      $('#btnReplaceAll').click(function() {
 
+        var footerandhtml =  document.getElementById('r-header').value + document.getElementById('baseText').value + document.getElementById('r-footer').value;
+        document.getElementById("baseText").value =footerandhtml;
+        
         var text  = document.getElementById('baseText').value.replace(/\r\n|\r/g, "\n");
         var lines = text.split( '\n' );
         var outArray = new Array();
@@ -37,9 +132,11 @@
         for ( var i = 0; i < lines.length; i++ ) {
             // 空行は無視する
             if ( lines[i] == '' ) {
-                lines[i]  = '<p>&nbsp;</p>';
+                //lines[i]  = '<p>&nbsp;</p>';
+                lines[i]  = document.getElementById('blank-line').value
             } else {
-                lines[i]  = '<p><span style="font-size: 12pt;">' + lines[i] + '</span></p>';
+                //lines[i]  = '<p><span style="font-size: 12pt;">' + lines[i] + '</span></p>';
+                lines[i]  = document.getElementById('before-line').value + lines[i] + document.getElementById('after-line').value;
             }
         
             lines[i] = lines[i].replace('[link]', '')
@@ -58,6 +155,8 @@
             $("textarea.outputhtml").val(overridehtml);
         }
 
+        copyText('outputhtml');
+
         });
 
         function AutoLink(str) {
@@ -68,6 +167,13 @@
          
             return str.replace(regexp_url, regexp_makeLink);
         }
+
+        function copyText(id){
+            var txt = document.getElementById(id);
+            txt.select();
+            document.execCommand("Copy");
+        }
+
 
     function createRangeSelect(start, end) {
         let selection = document.getElementById('baseText');  
