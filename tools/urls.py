@@ -19,5 +19,5 @@ urlpatterns = [
     path('kousei-f/',views.KouseiFView.as_view(),name='kousei-f'),
     path('wordcloud/',views.WordCloudView.as_view(),name='wordcloud'),
     path('htmlmail/',views.HtmlMailView.as_view(),name='htmlmail'),
-
+    path('domain-age/',views.DomainAgeView.as_view(),name='domain-age'),
 ]

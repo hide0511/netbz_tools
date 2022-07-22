@@ -29,7 +29,166 @@ import base64
 
 from django.http import JsonResponse
 
+from tld import get_tld
+import datetime
+
 # Create your views here.
+
+class DomainAgeView(TemplateView):
+    template_name = "domain-age.html"
+    def get(self, rq):
+
+        print('domainage')
+
+        if rq.is_ajax():        
+            if rq.method == 'GET':  # GETの処理
+                param1 = rq.GET.get("param1")  # GETパラメータ1
+                keyword = param1
+
+                result = DomainAgeView.getDomainAge(self,keyword)
+
+                data = ''
+                find_cnt = 0
+                list_days = []
+
+                data = data + '<div class="resultSite">'
+                data = data + '<table class="domaintbl"><tr><th>ドメイン</th><th>リンク</th><th>開始日</th><th>ドメイン年齢</th></tr>'
+
+
+                for dc in result:
+                        data = data + '<tr>'
+                        data = data + f'<td>{dc["domain"]}</td>'
+                        data = data + f'<td><a href="{dc["url"]}" target="_blank">Link</a></td>'
+                        #create_date = datetime.datetime.strptime(dc['date'], "%Y/%m/%d %H:%M:%S")
+
+                        str_date = str(dc['date'])
+                        create_date = []
+                        nofind_flg = 0
+                        d_today = datetime.datetime.now()
+ 
+                        if re.findall(r'\b\d{4}-\d{2}-\d{2}\b', str_date):      #2014-09-19 11:27:16
+                            create_date = re.findall(r'\b\d{4}-\d{2}-\d{2}\b', str_date)[0]
+                        elif re.findall(r'\d{4}, \d{1,2}, \d{1,2}', str_date):    #[datetime.datetime(2015, 8, 8, 9, 46, 32), datetime.datetime(2015, 8, 31, 7, 46, 32)]
+                            create_date = re.findall(r'\d{4}, \d{1,2}, \d{1,2}', str_date)[0].replace(', ', '-')
+                        else:
+                            create_date = str_date
+                            nofind_flg = 1
+                        
+                        
+                        if nofind_flg != 1:
+                            date_dt = datetime.datetime.strptime(create_date, '%Y-%m-%d')
+                            data = data + f"<td>{date_dt.strftime('%Y年%m月%d日')}</td>"
+                            td = d_today - date_dt
+                            data = data + f'<td>{str(DomainAgeView.DaysToYearMonth(self,td.days))}</td>'
+                            list_days.append(int(td.days))
+                            find_cnt += 1
+                        else:
+                            data = data + f"<td>{create_date}</td>"
+                            data = data + '<td>None</td>'
+                                        
+
+                        data = data + '</tr>'
+                data = data + '</table></div>'
+                if len(list_days) > 0:
+                    data = '<p class="h3">最小ドメイン年齢：' + str(DomainAgeView.DaysToYearMonth(self,min(list_days))) + '</p><p class="h3">平均ドメイン年齢：' + str(DomainAgeView.DaysToYearMonth(self,sum(list_days)/len(list_days))) + '</p>'  + data
+                return HttpResponse(data)
+
+        return render(rq, 'domain-age.html')
+
+    def DaysToYearMonth(self,days_num):
+
+        ret = ''
+
+        nen, amari = divmod(days_num, 365)
+        tuki, hi = divmod(amari, 30)
+        
+        ret = str(nen) + '年' + str(tuki) + 'ヶ月'
+
+        return ret  
+ 
+    def getDomainAge(self,keyword):
+        ret = []
+
+        links = getGooleList(self,keyword)
+
+        cnt = 0
+        for link in links:
+            if cnt >= 10 :
+                break
+
+            try:
+                target_url = link
+                domain = get_tld(target_url, as_object=True).fld
+
+                print(domain)
+
+                dc = {}
+                idc = {}
+
+                #result = re.search('(?:https?://)?(?P<host>.*?)(?:[:#?/@]|$)', link)
+                #domain = result.group('host')
+
+                #辞書型で取得
+                if domain.endswith('.jp'):
+                    dc = whois.NICClient().whois_lookup({'whoishost': 'whois.jprs.jp'}, domain + '/e', 0)
+                    dc = whois.parser.WhoisJp(domain , dc)
+                else:
+                    dc = whois.whois(domain)
+
+                date_flg = 0
+                for key, value in dc.items():
+                    if key in ['creation_date','Creation Date','Registered Date','Created on','Created']:
+                        print(value)
+                        idc['domain'] = domain
+                        idc['date'] = value
+                        idc['url'] = link
+                        ret.append(idc)
+                        date_flg = 1
+                if date_flg == 0:
+                    print(dc)                    
+
+                sleep(1.5)
+                
+                cnt = cnt + 1
+            except:
+                continue
+                   
+        return ret    
+    """
+        def get_domain_created_date(domain_info):
+        created_date = ""
+        search_word = ""
+        sub_info = ""
+        word_position = ""
+        if 'Creation Date' in domain_info:
+            search_word = r'Creation Date(.*)'
+            sub_info = re.search(search_word, domain_info).group(1)
+            word_position = r'\d{4}-\d{2}-\d{2}'
+
+        elif 'Registered Date' in domain_info:
+            search_word = r'\[Registered Date\](.*)'
+            sub_info = re.search(search_word, domain_info).group(1)
+            word_position = r'\d{4}/\d{2}/\d{2}'
+
+        elif 'Created on' in domain_info:
+            search_word = r'\[Created on\](.*)'
+            sub_info = re.search(search_word, domain_info).group(1)
+            word_position = r'\d{4}/\d{2}/\d{2}'
+
+        elif 'Created' in domain_info: 
+            search_word = r'Created(.*)'
+            sub_info = re.search(search_word, domain_info).group(1)
+            word_position = r'\d{4}-\d{2}-\d{2}'
+        else:
+            print(domain_info)
+            return 'unknown'
+        
+        if re.search(word_position, sub_info) is None:
+            created_date = 'unknown'
+        else:
+            created_date = re.search(word_position, sub_info).group()
+        return created_date
+    """    
 
 class AdvItem:
     def __init__(self, title,summary,cite):
@@ -569,10 +728,17 @@ class WhoIsView(TemplateView):
                 url = param1
 
                 result = re.search('(?:https?://)?(?P<host>.*?)(?:[:#?/@]|$)', url)
+                domain = result.group('host')
 
                 #辞書型で取得
-                dc = whois.whois(result.group('host'))
-
+                print(domain)
+                if domain.endswith('.jp'):
+                    dc = whois.NICClient().whois_lookup({'whoishost': 'whois.jprs.jp'}, domain + '/e', 0)
+                    dc = whois.parser.WhoisJp(domain , dc)
+                    #dc = whois.whois(domain)
+                else:
+                    dc = whois.whois(domain)
+                
                 data = '<div><ul>'
 
                 for key, value in dc.items():
