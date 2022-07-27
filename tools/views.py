@@ -70,6 +70,8 @@ class DomainAgeView(TemplateView):
                             create_date = re.findall(r'\b\d{4}-\d{2}-\d{2}\b', str_date)[0]
                         elif re.findall(r'\d{4}, \d{1,2}, \d{1,2}', str_date):    #[datetime.datetime(2015, 8, 8, 9, 46, 32), datetime.datetime(2015, 8, 31, 7, 46, 32)]
                             create_date = re.findall(r'\d{4}, \d{1,2}, \d{1,2}', str_date)[0].replace(', ', '-')
+                        elif re.findall(r'\d{4}/\d{1,2}/\d{1,2}', str_date):    #[datetime.datetime(2015, 8, 8, 9, 46, 32), datetime.datetime(2015, 8, 31, 7, 46, 32)]
+                            create_date = re.findall(r'\d{4}/\d{1,2}/\d{1,2}', str_date)[0].replace('/', '-')  #2014/09/19 11:27:16
                         else:
                             create_date = str_date
                             nofind_flg = 1
@@ -112,9 +114,14 @@ class DomainAgeView(TemplateView):
         links = getGooleList(self,keyword)
 
         cnt = 0
+        cnt_all = 0
         for link in links:
             if cnt >= 10 :
                 break
+            if cnt_all >= 30 :
+                break
+
+            cnt_all = cnt_all + 1    
 
             try:
                 target_url = link
@@ -139,19 +146,24 @@ class DomainAgeView(TemplateView):
                 for key, value in dc.items():
                     if key in ['creation_date','Creation Date','Registered Date','Created on','Created']:
                         print(value)
-                        idc['domain'] = domain
-                        idc['date'] = value
-                        idc['url'] = link
-                        ret.append(idc)
-                        date_flg = 1
-                if date_flg == 0:
+                        if str.strip(str(value)) != 'None':
+                            idc['domain'] = domain
+                            idc['date'] = value
+                            idc['url'] = link
+                            ret.append(idc)
+                            date_flg = 1
+                if date_flg == 1:
+                    cnt = cnt + 1
+                else:
                     print(dc)                    
+
+                print('sleep')
 
                 sleep(1.5)
                 
-                cnt = cnt + 1
+                
             except:
-                continue
+               continue
                    
         return ret    
     """
