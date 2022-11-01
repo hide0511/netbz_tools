@@ -1009,7 +1009,7 @@ def getGooleList(self,keyword):
     request = urllib.request.Request(url, data, headers)
     response = urllib.request.urlopen(request)
     html = response.read()
-    sleep(0.3)
+    sleep(random.uniform(0.3,1.2))
 
     soup1 = BeautifulSoup(html,'html.parser')
 
