@@ -74,7 +74,7 @@
             })
             .fail(function() {
                 // 通信失敗時の処理を記述
-                $('#resultGET').text('リクエストが多すぎます。時間をおいて再度お試しください。');
+                $('#resultGET').text('429 リクエストが多すぎます。時間をおいて再度お試しください。');
             })
             .always( function(data) {
                 // Loading 画像を消す
