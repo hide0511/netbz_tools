@@ -31,6 +31,7 @@ from django.http import JsonResponse
 
 from tld import get_tld
 import datetime
+from urllib.parse import urlparse
 
 # Create your views here.
 
@@ -694,6 +695,7 @@ class FrequentWordView(TemplateView):
 
             try:
                 res = requests.get(link)
+                res.encoding = res.apparent_encoding
                 sleep(0.01)
 
                 if res.status_code == 200:
@@ -810,6 +812,7 @@ class ChrCountView(TemplateView):
 
         links = getGooleList(self,keyword)
 
+
         cnt = 0
         for link in links:
             if cnt >= 10 :
@@ -819,14 +822,15 @@ class ChrCountView(TemplateView):
 
             try:
                 res = requests.get(link)
+                res.encoding = res.apparent_encoding
                 sleep(0.01)
-
 
                 if res.status_code == 200:
 
+                    print(link)
                     soup2 = BeautifulSoup(res.text,'html.parser')
                     
-                    dc['title'] = soup2.title.string
+                    dc['title'] = urllib.parse.unquote(soup2.title.string)
                     dc['link'] = link
                     
                     for script in soup2(["script", "style"]):
@@ -903,14 +907,17 @@ class HeadingView(TemplateView):
 
             try:
                 res = requests.get(link)
+                res.encoding = res.apparent_encoding
+
                 sleep(0.01)
 
+                print(link)
 
                 if res.status_code == 200:
 
                     soup2 = BeautifulSoup(res.content,'html.parser')
                     
-                    dc['title'] = soup2.title.string
+                    dc['title'] =  urllib.parse.unquote(soup2.title.string)
                     dc['link'] = link
                     
                     tags = soup2.find_all(['h1','h2','h3'])
@@ -995,6 +1002,40 @@ class SuggestView(TemplateView):
 
 def getGooleList(self,keyword):
 
+
+    # Google検索するキーワードを設定
+    search_word = keyword
+
+    # 上位から何件までのサイトを抽出するか指定する
+    pages_num = 10 + 1
+
+    print(f'【検索ワード】{search_word}')
+
+    # Googleから検索結果ページを取得する
+    url = f'https://www.google.co.jp/search?hl=ja&num={pages_num}&q={search_word}'
+    request = requests.get(url)
+
+    # Googleのページ解析を行う
+    soup = BeautifulSoup(request.text, "html.parser")
+    search_site_list = soup.select('div.kCrYT > a')
+
+
+    links = []
+    # ページ解析と結果の出力
+    for rank, site in zip(range(1, pages_num), search_site_list):
+        print(rank)
+        try:
+            site_title = site.select('h3.zBAuLc')[0].text
+        except IndexError:
+            site_title = site.select('img')[0]['alt']
+        site_url = site['href'].replace('/url?q=', '')
+        # 結果を出力する
+
+        links.append(site_url.split('&')[0])
+        print(str(rank) + "位: " + site_title + ": " + site_url.split('&')[0])
+
+
+    '''
     url = 'https://www.google.com/search?q={}&hl=ja&sourceid=chrome&ie=UTF-8&num=15'
 
     print(keyword)
@@ -1015,9 +1056,16 @@ def getGooleList(self,keyword):
 
     _links = soup1.select('.yuRUbf > a')
 
+    print(html)
+
     links = [link.get('href') for link in _links]
 
+    print(links)
+    print('links')
+'''
+
     return links
+
 
 class SuggestView_old(TemplateView):
     template_name = "suggest.html"
